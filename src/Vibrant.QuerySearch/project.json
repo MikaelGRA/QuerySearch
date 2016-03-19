@@ -1,10 +1,15 @@
 ﻿{
    "version": "1.0.0-*",
-   "description": "Vibrant.QuerySearch Class Library",
+   "title": "QuerySearch for .NET",
+   "description": "Provides IQueryable extensions for easily working with filtering and pagination.",
    "authors": [ "MikaelGRA" ],
-   "tags": [ "" ],
-   "projectUrl": "",
-   "licenseUrl": "",
+   "owners": [ "MikaelGRA" ],
+   "tags": [ "queryable", "entity-framework" ],
+   "projectUrl": "https://github.com/MikaelGRA/QuerySearch",
+   "licenseUrl": "https://github.com/MikaelGRA/QuerySearch/blob/master/LICENSE",
+   "releaseNotes": "https://github.com/MikaelGRA/QuerySearch/blob/master/CHANGELOG.md",
+   "copyright": "Copyright (c) 2015-2016 MikaelGRA",
+   "language": "en-US",
 
    "frameworks": {
       "net45": { },

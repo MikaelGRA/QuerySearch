@@ -1,10 +1,15 @@
 {
-  "version": "1.0.0-*",
-  "description": "Vibrant.QuerySearch.Unity Class Library",
-  "authors": [ "MikaelGRA" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
+   "version": "1.0.0-*",
+   "title": "Unity ServiceRegistry for QuerySearch",
+   "description": "Provides an implementation of IServiceRegistry implemented using Unity.",
+   "authors": [ "MikaelGRA" ],
+   "owners": [ "MikaelGRA" ],
+   "tags": [ "queryable", "unity" ],
+   "projectUrl": "https://github.com/MikaelGRA/QuerySearch",
+   "licenseUrl": "https://github.com/MikaelGRA/QuerySearch/blob/master/LICENSE",
+   "releaseNotes": "https://github.com/MikaelGRA/QuerySearch/blob/master/CHANGELOG.md",
+   "copyright": "Copyright (c) 2015-2016 MikaelGRA",
+   "language": "en-US",
    "frameworks": {
       "net45": {
          "dependencies": {
