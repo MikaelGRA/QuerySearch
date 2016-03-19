@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Vibrant.QuerySearch
 {
+   /// <summary>
+   /// DynamicQueryable provides extensions useful extension methods for IQueryable.
+   /// </summary>
    public static class DynamicQueryable
    {
       private static readonly HashSet<string> Descending = new HashSet<string>( StringComparer.OrdinalIgnoreCase ) { "desc", "descending" };
@@ -17,6 +20,13 @@ namespace Vibrant.QuerySearch
       private static readonly MethodInfo ThenByMethod = typeof( Queryable ).GetMethods().Single( x => x.Name == "ThenBy" && x.IsGenericMethodDefinition == true && x.GetGenericArguments().Length == 2 && x.GetParameters().Length == 2 );
       private static readonly MethodInfo ThenByDescendingMethod = typeof( Queryable ).GetMethods().Single( x => x.Name == "ThenByDescending" && x.IsGenericMethodDefinition == true && x.GetGenericArguments().Length == 2 && x.GetParameters().Length == 2 );
 
+      /// <summary>
+      /// Orders the IQueryable based on the provided string.
+      /// </summary>
+      /// <typeparam name="TEntity"></typeparam>
+      /// <param name="query">The IQueryable to be sorted.</param>
+      /// <param name="orderBy">A string representing the sorting: Ex.: Property.Path DESC</param>
+      /// <returns>An ordered IQueryable</returns>
       public static IQueryable<TEntity> OrderBy<TEntity>( this IQueryable<TEntity> query, string orderBy )
       {
          var parameter = Expression.Parameter( typeof( TEntity ), "x" );
