@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0-*",
+  "description": "Vibrant.QuerySearch.Unity Class Library",
+  "authors": [ "MikaelGRA" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+   "frameworks": {
+      "net451": { }
+   },
+   "dependencies": {
+      "Unity": "3.0.1304",
+      "Vibrant.QuerySearch": "1.0.0-*"
+   }
+}

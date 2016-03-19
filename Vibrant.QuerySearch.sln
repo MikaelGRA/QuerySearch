@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3059BB00-E0A0-4C19-B331-848A1794AD93}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{9468A0D5-D3A5-4A13-84B5-C8C983830131}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Vibrant.QuerySearch", "src\Vibrant.QuerySearch\Vibrant.QuerySearch.xproj", "{9CCA545B-4A39-4D43-A539-BCDA1DE8BD83}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Vibrant.QuerySearch.Unity", "src\Vibrant.QuerySearch.Unity\Vibrant.QuerySearch.Unity.xproj", "{9BB1A293-213C-4A1B-AB81-E5D305C7A6ED}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Vibrant.QuerySearch.EntityFramework", "src\Vibrant.QuerySearch.EntityFramework\Vibrant.QuerySearch.EntityFramework.xproj", "{9B3B9D40-6F49-4844-A557-8EE900610FA3}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Vibrant.QuerySearch.EntityFramework7", "src\Vibrant.QuerySearch.EntityFramework7\Vibrant.QuerySearch.EntityFramework7.xproj", "{EAE5459B-6372-40BC-BFCB-C5FE3F3EF137}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9CCA545B-4A39-4D43-A539-BCDA1DE8BD83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CCA545B-4A39-4D43-A539-BCDA1DE8BD83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CCA545B-4A39-4D43-A539-BCDA1DE8BD83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CCA545B-4A39-4D43-A539-BCDA1DE8BD83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BB1A293-213C-4A1B-AB81-E5D305C7A6ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BB1A293-213C-4A1B-AB81-E5D305C7A6ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BB1A293-213C-4A1B-AB81-E5D305C7A6ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BB1A293-213C-4A1B-AB81-E5D305C7A6ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B3B9D40-6F49-4844-A557-8EE900610FA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B3B9D40-6F49-4844-A557-8EE900610FA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B3B9D40-6F49-4844-A557-8EE900610FA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B3B9D40-6F49-4844-A557-8EE900610FA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAE5459B-6372-40BC-BFCB-C5FE3F3EF137}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAE5459B-6372-40BC-BFCB-C5FE3F3EF137}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAE5459B-6372-40BC-BFCB-C5FE3F3EF137}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAE5459B-6372-40BC-BFCB-C5FE3F3EF137}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9CCA545B-4A39-4D43-A539-BCDA1DE8BD83} = {3059BB00-E0A0-4C19-B331-848A1794AD93}
+		{9BB1A293-213C-4A1B-AB81-E5D305C7A6ED} = {3059BB00-E0A0-4C19-B331-848A1794AD93}
+		{9B3B9D40-6F49-4844-A557-8EE900610FA3} = {3059BB00-E0A0-4C19-B331-848A1794AD93}
+		{EAE5459B-6372-40BC-BFCB-C5FE3F3EF137} = {3059BB00-E0A0-4C19-B331-848A1794AD93}
+	EndGlobalSection
+EndGlobal

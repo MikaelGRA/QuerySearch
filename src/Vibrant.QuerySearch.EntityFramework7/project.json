@@ -1,0 +1,15 @@
+﻿{
+  "version": "1.0.0-*",
+  "description": "Vibrant.QuerySearch.EntityFramework7 Class Library",
+  "authors": [ "MikaelGRA" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+   "frameworks": {
+      "net451": { }
+   },
+   "dependencies": {
+      "EntityFramework.Core": "7.0.0-rc1-final",
+      "Vibrant.QuerySearch": "1.0.0-*"
+   }
+}
