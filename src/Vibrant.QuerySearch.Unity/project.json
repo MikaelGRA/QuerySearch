@@ -6,10 +6,19 @@
   "projectUrl": "",
   "licenseUrl": "",
    "frameworks": {
-      "net451": { }
+      "net45": {
+         "dependencies": {
+            "Unity": "3.0.1304"
+         }
+      },
+      "dotnet": {
+         "dependencies": {
+            "Unity": "3.5.1404",
+            "Microsoft.CSharp": "4.0.0"
+         }
+      }
    },
    "dependencies": {
-      "Unity": "3.0.1304",
       "Vibrant.QuerySearch": "1.0.0-*"
    }
 }

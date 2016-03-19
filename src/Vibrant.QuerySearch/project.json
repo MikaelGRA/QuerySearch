@@ -1,12 +1,20 @@
 ﻿{
-  "version": "1.0.0-*",
-  "description": "Vibrant.QuerySearch Class Library",
-  "authors": [ "MikaelGRA" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
+   "version": "1.0.0-*",
+   "description": "Vibrant.QuerySearch Class Library",
+   "authors": [ "MikaelGRA" ],
+   "tags": [ "" ],
+   "projectUrl": "",
+   "licenseUrl": "",
 
-  "frameworks": {
-    "net451": { }
-  }
+   "frameworks": {
+      "net45": { },
+      "dotnet": {
+         "dependencies": {
+            "Microsoft.CSharp": "4.0.0",
+            "System.Collections": "4.0.10",
+            "System.Linq": "4.0.0",
+            "System.Linq.Queryable": "4.0.0"
+         }
+      }
+   }
 }

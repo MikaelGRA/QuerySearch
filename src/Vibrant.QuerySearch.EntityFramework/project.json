@@ -6,7 +6,7 @@
   "projectUrl": "",
   "licenseUrl": "",
    "frameworks": {
-      "net451": { }
+      "net45": { }
    },
    "dependencies": {
       "EntityFramework": "6.0.0",
