@@ -18,8 +18,7 @@
       },
       "dotnet": {
          "dependencies": {
-            "Unity": "3.5.1404",
-            "Microsoft.CSharp": "4.0.0"
+            "Unity": "3.5.1404"
          }
       }
    },

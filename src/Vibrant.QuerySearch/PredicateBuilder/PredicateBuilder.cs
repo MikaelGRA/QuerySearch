@@ -6,9 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Vibrant.QuerySearch.Predicates
-{/// <summary>
- /// Enables the efficient, dynamic composition of query predicates.
- /// </summary>
+{
+   /// <summary>
+   /// Enables the efficient, dynamic composition of query predicates.
+   /// </summary>
    public static class PredicateBuilder
    {
       /// <summary>

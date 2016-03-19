@@ -12,11 +12,7 @@
    "language": "en-US",
    "frameworks": {
       "net451": { },
-      "dotnet5.4": {
-         "dependencies": {
-            "Microsoft.CSharp": "4.0.0"
-         }
-      }
+      "dotnet5.4": { }
    },
    "dependencies": {
       "EntityFramework.Core": "7.0.0-rc1-final",

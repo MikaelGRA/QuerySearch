@@ -10,6 +10,24 @@ using Vibrant.QuerySearch.Predicates;
 
 namespace Vibrant.QuerySearch
 {
+   /// <summary>
+   /// A default implrmentation of IFilterProvider that provides support for:
+   /// <list type="bullet">
+   /// <item>
+   /// <description>Sentence search.</description>
+   /// </item>
+   /// <item>
+   /// <description>Word search.</description>
+   /// </item>
+   /// <item>
+   /// <description>Keyword search.</description>
+   /// </item>
+   /// <item>
+   /// <description>Localized keyword search.</description>
+   /// </item>
+   /// </list>
+   /// </summary>
+   /// <typeparam name="TEntity"></typeparam>
    public class DefaultFilterProvider<TEntity> : IFilterProvider<TEntity>
    {
       private Dictionary<string, Expression<Func<TEntity, bool>>> _predefinedPredicates;
@@ -21,6 +39,10 @@ namespace Vibrant.QuerySearch
 
       private ILocalizationService _localizationService;
 
+      /// <summary>
+      /// Constructs a DefaultFilterProvider.
+      /// </summary>
+      /// <param name="localization"></param>
       public DefaultFilterProvider( ILocalizationService localization )
       {
          _localizationService = localization;
@@ -30,6 +52,12 @@ namespace Vibrant.QuerySearch
          _parameter = Expression.Parameter( typeof( TEntity ), "x" );
       }
 
+      /// <summary>
+      /// Applies filtering to the IQueryable provided.
+      /// </summary>
+      /// <param name="query">The IQueryable that is to be filtered.</param>
+      /// <param name="filteringForm">The filtering form.</param>
+      /// <returns>A filtered IQueryable.</returns>
       public IQueryable<TEntity> ApplyWhere( IQueryable<TEntity> query, IFilterForm filteringForm )
       {
          var term = filteringForm.GetTerm();
@@ -129,21 +157,42 @@ namespace Vibrant.QuerySearch
             return query;
          }
       }
+
+      /// <summary>
+      /// Registers a keyword to a predicate that will be used when the keyword is
+      /// encountered.
+      /// </summary>
+      /// <param name="keyword">The keyword to look for.</param>
+      /// <param name="predicate">The predicate to be applied to an IQueryable when the keyword is encountered.</param>
       public void RegisterKeyword( string keyword, Expression<Func<TEntity, bool>> predicate )
       {
          _predefinedPredicates[ keyword ] = predicate;
       }
 
+      /// <summary>
+      /// Registers a localized keyword to a predicated that will be used when the 
+      /// keyword is encountered.
+      /// </summary>
+      /// <param name="key">This is the key to be used to lookup the localized keyword.</param>
+      /// <param name="predicate">This is the predicate that is to be applied when the keyword is encountered.</param>
       public void RegisterLocalizedKeyword( string key, Expression<Func<TEntity, bool>> predicate )
       {
          _localizationKeyToPredicate[ key ] = predicate;
       }
 
+      /// <summary>
+      /// Registers a function that will be used to apply word search to an entity.
+      /// </summary>
+      /// <param name="getPredicate">This is a function that returns a predicate that filters on the provided text.</param>
       public void RegisterWordSearch( Func<string, Expression<Func<TEntity, bool>>> getPredicate )
       {
          _getFreeWordPredicate = getPredicate;
       }
 
+      /// <summary>
+      /// Registers a function that will be used to apply sentence search to an entity.
+      /// </summary>
+      /// <param name="getPredicate">This is a function that returns a predicate that filters on the provided text.</param>
       public void RegisterSentenceSearch( Func<string, Expression<Func<TEntity, bool>>> getPredicate )
       {
          _getFreeSentencePredicate = getPredicate;
