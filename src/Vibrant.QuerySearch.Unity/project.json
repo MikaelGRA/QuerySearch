@@ -1,7 +1,7 @@
 {
    "version": "1.0.0-*",
-   "title": "Unity ServiceRegistry for QuerySearch",
-   "description": "Provides an implementation of IServiceRegistry implemented using Unity.",
+   "title": "Unity DependencyResolver for QuerySearch",
+   "description": "Provides an implementation of IDependencyResolver implemented using Unity.",
    "authors": [ "MikaelGRA" ],
    "owners": [ "MikaelGRA" ],
    "tags": [ "queryable", "unity" ],
