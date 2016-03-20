@@ -8,11 +8,8 @@ using System.Threading.Tasks;
 
 namespace Vibrant.QuerySearch
 {
-   public class PropertyComparison : IPropertyComparison
+   public class PropertyComparison : IMemberComparison
    {
-      private Type _valueType;
-      private Expression _propertyGetter;
-
       public string Path { get; set; }
 
       public object Value { get; set; }
@@ -29,29 +26,9 @@ namespace Vibrant.QuerySearch
          return Type;
       }
 
-      public Expression GetPropertyGetter( ParameterExpression parameter )
+      public MemberAccess GetMemberAccess( ParameterExpression parameter )
       {
-         ReflectPropertyPath( parameter );
-
-         return _propertyGetter;
-      }
-
-      public Type GetValueType( ParameterExpression parameter )
-      {
-         ReflectPropertyPath( parameter );
-
-         return _valueType;
-      }
-
-      private void ReflectPropertyPath( ParameterExpression parameter )
-      {
-         if( _propertyGetter == null )
-         {
-            var result = ExpressionHelper.CalculatePropertyGetter( parameter, Path );
-
-            _propertyGetter = result.PropertyGetter;
-            _valueType = result.PropertyType;
-         }
+         return ExpressionHelper.CalculateMemberAccess( parameter, Path );
       }
    }
 }

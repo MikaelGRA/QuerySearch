@@ -10,23 +10,25 @@ namespace Vibrant.QuerySearch
    public class SkipAndTakePaginationProvider<TEntity> : IPaginationProvider<TEntity>
    {
       private dynamic _defaultSort;
+      private ParameterExpression _parameter;
 
       public SkipAndTakePaginationProvider()
       {
          MaxTake = 20;
+         _parameter = Expression.Parameter( typeof( TEntity ), "x" );
       }
 
       public int MaxTake { get; set; }
 
       public PaginationResult<TEntity> ApplyPagination( IQueryable<TEntity> query, IPageForm form )
       {
-         var orderBy = form.GetOrderBy();
          var skip = form.GetSkip();
          var take = form.GetTake();
 
-         if( orderBy != null )
+         var sorting = form.GetSorting( _parameter )?.ToList();
+         if( sorting != null && sorting.Count > 0 )
          {
-            query = query.OrderBy( orderBy );
+            query = query.OrderBy( _parameter, sorting );
          }
          else
          {

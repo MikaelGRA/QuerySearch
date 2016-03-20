@@ -118,27 +118,33 @@ namespace Vibrant.QuerySearch
             foreach( var propertyComparison in parameters )
             {
                var comparisonType = propertyComparison.GetComparisonType();
-               var propertyGetter = propertyComparison.GetPropertyGetter( _parameter );
-               var propertyValue = Convert.ChangeType( propertyComparison.GetValue(), propertyComparison.GetValueType( _parameter ) );
-               var constant = Expression.Constant( propertyValue );
+               var memberAccess = propertyComparison.GetMemberAccess( _parameter );
+               var memberAccessor = memberAccess.MemberAccessor;
+               var propertyType = memberAccess.MemberType;
+               var unwrappedPropertyType = propertyType.GetTypeInfo().IsGenericType && propertyType.GetGenericTypeDefinition() == typeof( Nullable<> )
+                  ? propertyType.GetGenericArguments()[ 0 ]
+                  : propertyType;
+               var propertyValue = propertyComparison.GetValue();
+               var convertedPropertyValue = Convert.ChangeType( propertyValue, unwrappedPropertyType );
+               var parameterizedPropertyValue = ExpressionHelper.WrappedConstant( propertyType, convertedPropertyValue );
 
                Expression left = null;
                switch( comparisonType )
                {
                   case ComparisonType.Equal:
-                     left = Expression.Equal( propertyGetter, constant );
+                     left = Expression.Equal( memberAccessor, parameterizedPropertyValue );
                      break;
                   case ComparisonType.GreaterThan:
-                     left = Expression.GreaterThan( propertyGetter, constant );
+                     left = Expression.GreaterThan( memberAccessor, parameterizedPropertyValue );
                      break;
                   case ComparisonType.GreaterThanOrEqual:
-                     left = Expression.GreaterThanOrEqual( propertyGetter, constant );
+                     left = Expression.GreaterThanOrEqual( memberAccessor, parameterizedPropertyValue );
                      break;
                   case ComparisonType.LessThan:
-                     left = Expression.LessThan( propertyGetter, constant );
+                     left = Expression.LessThan( memberAccessor, parameterizedPropertyValue );
                      break;
                   case ComparisonType.LessThanOrEqual:
-                     left = Expression.LessThanOrEqual( propertyGetter, constant );
+                     left = Expression.LessThanOrEqual( memberAccessor, parameterizedPropertyValue );
                      break;
                   default:
                      throw new InvalidOperationException( $"Invalid comparison type '{comparisonType}'." );

@@ -21,6 +21,6 @@ namespace Vibrant.QuerySearch
       /// Gets any additional filters to be used for filtering.
       /// </summary>
       /// <returns>An enumerable of property comparisons.</returns>
-      IEnumerable<IPropertyComparison> GetAdditionalFilters();
+      IEnumerable<IMemberComparison> GetAdditionalFilters();
    }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,7 +26,7 @@ namespace Vibrant.QuerySearch
          return Term;
       }
 
-      public IEnumerable<IPropertyComparison> GetAdditionalFilters()
+      public IEnumerable<IMemberComparison> GetAdditionalFilters()
       {
          return Parameters;
       }
@@ -45,9 +46,13 @@ namespace Vibrant.QuerySearch
          return Page;
       }
 
-      public string GetOrderBy()
+      public IEnumerable<SortMemberAccess> GetSorting( ParameterExpression parameter )
       {
-         return OrderBy;
+         if( !string.IsNullOrWhiteSpace( Term ) )
+         {
+            return ExpressionHelper.CalculateSortMemberAccess( parameter, OrderBy );
+         }
+         return null;
       }
    }
 }

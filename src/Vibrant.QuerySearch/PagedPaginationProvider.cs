@@ -11,23 +11,25 @@ namespace Vibrant.QuerySearch
    public class PagedPaginationProvider<TEntity> : IPaginationProvider<TEntity>
    {
       private dynamic _defaultSort;
+      private ParameterExpression _parameter;
 
       public PagedPaginationProvider()
       {
          PageSize = 20;
+         _parameter = Expression.Parameter( typeof( TEntity ), "x" );
       }
 
       public int PageSize { get; set; }
 
       public PaginationResult<TEntity> ApplyPagination( IQueryable<TEntity> query, IPageForm form )
       {
-         var orderBy = form.GetOrderBy();
          var page = form.GetPage();
          var skip = form.GetSkip();
 
-         if( orderBy != null )
+         var sorting = form.GetSorting( _parameter )?.ToList();
+         if( sorting != null && sorting.Count > 0 )
          {
-            query = query.OrderBy( orderBy );
+            query = query.OrderBy( _parameter, sorting );
          }
          else
          {

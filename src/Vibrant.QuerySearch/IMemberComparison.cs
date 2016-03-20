@@ -8,14 +8,12 @@ using System.Threading.Tasks;
 
 namespace Vibrant.QuerySearch
 {
-   public interface IPropertyComparison
+   public interface IMemberComparison
    {
       object GetValue();
 
       ComparisonType GetComparisonType();
-
-      Expression GetPropertyGetter( ParameterExpression parameter );
-
-      Type GetValueType( ParameterExpression parameter );
+      
+      MemberAccess GetMemberAccess( ParameterExpression parameter );
    }
 }

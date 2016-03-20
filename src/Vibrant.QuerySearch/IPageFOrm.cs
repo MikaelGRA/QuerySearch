@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -30,9 +31,9 @@ namespace Vibrant.QuerySearch
       int? GetPage();
 
       /// <summary>
-      /// Gets the ordering.
+      /// Gets the sorting to be used.
       /// </summary>
       /// <returns></returns>
-      string GetOrderBy();
+      IEnumerable<SortMemberAccess> GetSorting( ParameterExpression parameter );
    }
 }
