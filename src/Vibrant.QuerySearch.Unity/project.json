@@ -1,5 +1,5 @@
 {
-   "version": "1.0.0-*",
+   "version": "1.0.1-*",
    "title": "Unity DependencyResolver for QuerySearch",
    "description": "Provides an implementation of IDependencyResolver implemented using Unity.",
    "authors": [ "MikaelGRA" ],
@@ -13,7 +13,13 @@
    "frameworks": {
       "net45": {
          "dependencies": {
-            "Unity": "3.0.1304"
+            "Unity": "4.0.1"
+         },
+         "frameworkAssemblies": {
+            "System.Runtime": {
+               "type": "build",
+               "version": ""
+            }
          }
       },
       "dotnet": {
