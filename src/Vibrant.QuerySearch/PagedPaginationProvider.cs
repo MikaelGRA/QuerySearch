@@ -8,19 +8,36 @@ using System.Reflection;
 
 namespace Vibrant.QuerySearch
 {
+   /// <summary>
+   /// An implenentation of IPaginationProvider that forces exact pagination of result sets.
+   /// </summary>
+   /// <typeparam name="TEntity"></typeparam>
    public class PagedPaginationProvider<TEntity> : IPaginationProvider<TEntity>
    {
       private dynamic _defaultSort;
+      private SortDirection _defaultSortDirection;
       private ParameterExpression _parameter;
 
+      /// <summary>
+      /// Constructs an PagedPaginationProvider with a page size of 20.
+      /// </summary>
       public PagedPaginationProvider()
       {
          PageSize = 20;
          _parameter = Expression.Parameter( typeof( TEntity ), "x" );
       }
 
+      /// <summary>
+      /// Gets or sets the PageSize.
+      /// </summary>
       public int PageSize { get; set; }
 
+      /// <summary>
+      /// Applies the pagination form to the query.
+      /// </summary>
+      /// <param name="query">The query that should be paginated.</param>
+      /// <param name="form">The pagination form that should be applied to the query.</param>
+      /// <returns>A pagination result.</returns>
       public PaginationResult<TEntity> ApplyPagination( IQueryable<TEntity> query, IPageForm form )
       {
          var page = form.GetPage();
@@ -33,32 +50,44 @@ namespace Vibrant.QuerySearch
          }
          else
          {
-            query = Queryable.OrderBy( query, _defaultSort );
+            if( _defaultSortDirection == SortDirection.Ascending )
+            {
+               query = Queryable.OrderBy( query, _defaultSort );
+            }
+            else
+            {
+               query = Queryable.OrderByDescending( query, _defaultSort );
+            }
          }
 
-         int actualSkip = 0;
+         int actualPage = 0;
          if( page.HasValue )
          {
-            actualSkip = page.Value;
+            actualPage = page.Value;
          }
          else if( skip.HasValue )
          {
-            actualSkip = skip.Value / PageSize;
+            actualPage = skip.Value / PageSize;
          }
 
-         return new PaginationResult<TEntity>
-         {
-            Page = actualSkip,
-            PageSize = PageSize,
-            Skip = actualSkip * PageSize,
-            Take = PageSize,
-            Query = query.Skip( actualSkip * PageSize ).Take( PageSize ),
-         };
+         return new PaginationResult<TEntity>(
+            actualPage * PageSize,
+            PageSize,
+            actualPage,
+            PageSize,
+            query.Skip( actualPage * PageSize ).Take( PageSize ) );
       }
 
-      public void RegisterDefaultSort<TKey>( Expression<Func<TEntity, TKey>> defaultSort )
+      /// <summary>
+      /// Registers the default sorting behaviour.
+      /// </summary>
+      /// <typeparam name="TKey"></typeparam>
+      /// <param name="defaultSort">An expression representing the default sorting.</param>
+      /// <param name="direction">The direction of the default sorting.</param>
+      public void RegisterDefaultSort<TKey>( Expression<Func<TEntity, TKey>> defaultSort, SortDirection direction = SortDirection.Ascending )
       {
          _defaultSort = defaultSort;
+         _defaultSortDirection = direction;
       }
    }
 }

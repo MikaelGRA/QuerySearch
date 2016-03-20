@@ -18,6 +18,14 @@ namespace Vibrant.QuerySearch
       private static readonly MethodInfo ThenByMethod = typeof( Queryable ).GetMethods().Single( x => x.Name == "ThenBy" && x.IsGenericMethodDefinition == true && x.GetGenericArguments().Length == 2 && x.GetParameters().Length == 2 );
       private static readonly MethodInfo ThenByDescendingMethod = typeof( Queryable ).GetMethods().Single( x => x.Name == "ThenByDescending" && x.IsGenericMethodDefinition == true && x.GetGenericArguments().Length == 2 && x.GetParameters().Length == 2 );
 
+      /// <summary>
+      /// Sorts the queryable by the specified sort member accesses.
+      /// </summary>
+      /// <typeparam name="TEntity"></typeparam>
+      /// <param name="query">The query to be ordered.</param>
+      /// <param name="parameter">The parameter that was used to create the sort member accesses.</param>
+      /// <param name="sortMemberAccesses">The sort member accesses that the query will be sorted by.</param>
+      /// <returns>An ordered queryable.</returns>
       public static IQueryable<TEntity> OrderBy<TEntity>( this IQueryable<TEntity> query, ParameterExpression parameter, IEnumerable<SortMemberAccess> sortMemberAccesses )
       {
          bool hasSorted = false;
@@ -69,7 +77,7 @@ namespace Vibrant.QuerySearch
       {
          var parameter = Expression.Parameter( typeof( TEntity ), "x" );
 
-         return OrderBy( query, parameter, ExpressionHelper.CalculateSortMemberAccess( parameter, orderBy ) );
+         return OrderBy( query, parameter, ExpressionHelper.CalculateSortMemberAccesses( parameter, orderBy ) );
       }
    }
 }

@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Vibrant.QuerySearch
 {
-   public static class ServiceRegistry
+   public static class DependencyResolver
    {
-      static ServiceRegistry()
+      static DependencyResolver()
       {
       }
 
-      public static IServiceRegistry Current { get; set; }
+      public static IDependencyResolver Current { get; set; }
    }
 }

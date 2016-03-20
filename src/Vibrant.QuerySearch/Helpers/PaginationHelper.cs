@@ -6,8 +6,17 @@ using System.Threading.Tasks;
 
 namespace Vibrant.QuerySearch
 {
-   public class PaginationUtilities
+   /// <summary>
+   /// Simple class that can be used to work with pagination.
+   /// </summary>
+   public class PaginationHelper
    {
+      /// <summary>
+      /// Gets the number of pages from a count and a page size.
+      /// </summary>
+      /// <param name="count">The entry count.</param>
+      /// <param name="pageSize">The size of a page.</param>
+      /// <returns>The number of pages.</returns>
       public static int? GetPageCount( int count, int? pageSize )
       {
          if( !pageSize.HasValue )
