@@ -1,5 +1,5 @@
 {
-   "version": "1.0.1-*",
+   "version": "1.0.2-*",
    "title": "Unity DependencyResolver for QuerySearch",
    "description": "Provides an implementation of IDependencyResolver implemented using Unity.",
    "authors": [ "MikaelGRA" ],
@@ -29,6 +29,6 @@
       }
    },
    "dependencies": {
-      "Vibrant.QuerySearch": "1.0.0-*"
+      "Vibrant.QuerySearch": "1.0.1-*"
    }
 }

@@ -93,7 +93,7 @@ namespace Vibrant.QuerySearch
       /// <returns></returns>
       public IEnumerable<SortMemberAccess> GetSorting( ParameterExpression parameter )
       {
-         if( !string.IsNullOrWhiteSpace( Term ) )
+         if( !string.IsNullOrWhiteSpace( OrderBy ) )
          {
             return ExpressionHelper.CalculateSortMemberAccesses( parameter, OrderBy );
          }
