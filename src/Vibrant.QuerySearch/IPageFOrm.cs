@@ -31,6 +31,12 @@ namespace Vibrant.QuerySearch
       int? GetPage();
 
       /// <summary>
+      /// Gets the user-defined page size.
+      /// </summary>
+      /// <returns></returns>
+      int? GetPageSize();
+
+      /// <summary>
       /// Gets the sorting to be used.
       /// </summary>
       /// <returns></returns>

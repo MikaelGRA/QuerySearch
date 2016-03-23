@@ -1,5 +1,5 @@
 ﻿{
-   "version": "1.0.1-*",
+   "version": "1.0.2-*",
    "title": "QuerySearch for .NET",
    "description": "Provides IQueryable extensions for easily working with filtering and pagination.",
    "authors": [ "MikaelGRA" ],

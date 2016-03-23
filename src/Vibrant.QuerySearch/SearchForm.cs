@@ -23,9 +23,14 @@ namespace Vibrant.QuerySearch
       public int? Take { get; set; }
 
       /// <summary>
-      /// Gets or sets the page to retrieved.
+      /// Gets or sets the page to retrieve.
       /// </summary>
       public int? Page { get; set; }
+
+      /// <summary>
+      /// Gets or sets the size of the pages to retrieve.
+      /// </summary>
+      public int? PageSize { get; set; }
 
       /// <summary>
       /// Gets or sets a string representing the ordering of the retruend entries.
@@ -85,6 +90,15 @@ namespace Vibrant.QuerySearch
       public int? GetPage()
       {
          return Page;
+      }
+
+      /// <summary>
+      /// Gets the size of the pages to return.
+      /// </summary>
+      /// <returns></returns>
+      public int? GetPageSize()
+      {
+         return PageSize;
       }
 
       /// <summary>

@@ -24,6 +24,7 @@ namespace Vibrant.QuerySearch
       public PagedPaginationProvider()
       {
          PageSize = 20;
+         PredefinedPageSizes = new HashSet<int>();
          _parameter = Expression.Parameter( typeof( TEntity ), "x" );
       }
 
@@ -33,6 +34,16 @@ namespace Vibrant.QuerySearch
       public int PageSize { get; set; }
 
       /// <summary>
+      /// Gets or sets the pagination mode.
+      /// </summary>
+      public PaginationMode Mode { get; set; }
+
+      /// <summary>
+      /// Gets the predined page sizes.
+      /// </summary>
+      public ICollection<int> PredefinedPageSizes { get; private set; }
+
+      /// <summary>
       /// Applies the pagination form to the query.
       /// </summary>
       /// <param name="query">The query that should be paginated.</param>
@@ -40,6 +51,7 @@ namespace Vibrant.QuerySearch
       /// <returns>A pagination result.</returns>
       public PaginationResult<TEntity> ApplyPagination( IQueryable<TEntity> query, IPageForm form )
       {
+         var pageSize = GetPageSize( form );
          var page = form.GetPage();
          var skip = form.GetSkip();
 
@@ -67,15 +79,39 @@ namespace Vibrant.QuerySearch
          }
          else if( skip.HasValue )
          {
-            actualPage = skip.Value / PageSize;
+            actualPage = skip.Value / pageSize;
          }
 
          return new PaginationResult<TEntity>(
-            actualPage * PageSize,
-            PageSize,
+            actualPage * pageSize,
+            pageSize,
             actualPage,
-            PageSize,
-            query.Skip( actualPage * PageSize ).Take( PageSize ) );
+            pageSize,
+            query.Skip( actualPage * pageSize ).Take( pageSize ) );
+      }
+
+      private int GetPageSize( IPageForm form )
+      {
+         switch( Mode )
+         {
+            case PaginationMode.PageSize:
+               return PageSize;
+            case PaginationMode.PredefinedPageSizes:
+               var pageSize = form.GetPageSize();
+               if( !pageSize.HasValue )
+               {
+                  throw new QuerySearchException( "No page sizes has been specified in the query." );
+               }
+               if( !PredefinedPageSizes.Contains( pageSize.Value ) )
+               {
+                  throw new QuerySearchException( "The specified page size is not allowed." );
+               }
+               return pageSize.Value;
+            case PaginationMode.Any:
+               return form.GetPageSize() ?? PageSize;
+            default:
+               throw new QuerySearchException( $"Invalid PaginationMode configured: {Mode}." );
+         }
       }
 
       /// <summary>
