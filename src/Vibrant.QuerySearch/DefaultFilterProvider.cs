@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Resources;
 using System.Text;
-using Vibrant.QuerySearch.Predicates;
+using Vibrant.QuerySearch.Helpers;
 
 namespace Vibrant.QuerySearch
 {

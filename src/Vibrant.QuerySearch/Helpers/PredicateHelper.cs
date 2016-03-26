@@ -5,32 +5,32 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Vibrant.QuerySearch.Predicates
+namespace Vibrant.QuerySearch.Helpers
 {
    /// <summary>
    /// Enables the efficient, dynamic composition of query predicates.
    /// </summary>
-   public static class PredicateBuilder
+   internal static class PredicateHelper
    {
       /// <summary>
       /// Creates a predicate that evaluates to true.
       /// </summary>
-      public static Expression<Func<T, bool>> True<T>() { return param => true; }
+      internal static Expression<Func<T, bool>> True<T>() { return param => true; }
 
       /// <summary>
       /// Creates a predicate that evaluates to false.
       /// </summary>
-      public static Expression<Func<T, bool>> False<T>() { return param => false; }
+      internal static Expression<Func<T, bool>> False<T>() { return param => false; }
 
       /// <summary>
       /// Creates a predicate expression from the specified lambda expression.
       /// </summary>
-      public static Expression<Func<T, bool>> Create<T>( Expression<Func<T, bool>> predicate ) { return predicate; }
+      internal static Expression<Func<T, bool>> Create<T>( Expression<Func<T, bool>> predicate ) { return predicate; }
 
       /// <summary>
       /// Combines the first predicate with the second using the logical "and".
       /// </summary>
-      public static Expression<Func<T, bool>> And<T>( this Expression<Func<T, bool>> first, Expression<Func<T, bool>> second )
+      internal static Expression<Func<T, bool>> And<T>( this Expression<Func<T, bool>> first, Expression<Func<T, bool>> second )
       {
          return first.Compose( second, Expression.AndAlso );
       }
@@ -38,7 +38,7 @@ namespace Vibrant.QuerySearch.Predicates
       /// <summary>
       /// Combines the first predicate with the second using the logical "or".
       /// </summary>
-      public static Expression<Func<T, bool>> Or<T>( this Expression<Func<T, bool>> first, Expression<Func<T, bool>> second )
+      internal static Expression<Func<T, bool>> Or<T>( this Expression<Func<T, bool>> first, Expression<Func<T, bool>> second )
       {
          return first.Compose( second, Expression.OrElse );
       }
@@ -46,7 +46,7 @@ namespace Vibrant.QuerySearch.Predicates
       /// <summary>
       /// Negates the predicate.
       /// </summary>
-      public static Expression<Func<T, bool>> Not<T>( this Expression<Func<T, bool>> expression )
+      internal static Expression<Func<T, bool>> Not<T>( this Expression<Func<T, bool>> expression )
       {
          var negated = Expression.Not( expression.Body );
          return Expression.Lambda<Func<T, bool>>( negated, expression.Parameters );
@@ -78,7 +78,7 @@ namespace Vibrant.QuerySearch.Predicates
             this.map = map ?? new Dictionary<ParameterExpression, ParameterExpression>();
          }
 
-         public static Expression ReplaceParameters( Dictionary<ParameterExpression, ParameterExpression> map, Expression exp )
+         internal static Expression ReplaceParameters( Dictionary<ParameterExpression, ParameterExpression> map, Expression exp )
          {
             return new ParameterRebinder( map ).Visit( exp );
          }
