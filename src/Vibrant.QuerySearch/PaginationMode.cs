@@ -9,6 +9,7 @@ namespace Vibrant.QuerySearch
    {
       PageSize,
       PredefinedPageSizes,
-      Any,
+      AnyPageSize,
+      SkipAndTake,
    }
 }

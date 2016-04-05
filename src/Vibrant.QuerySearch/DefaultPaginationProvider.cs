@@ -12,7 +12,7 @@ namespace Vibrant.QuerySearch
    /// An implenentation of IPaginationProvider that forces exact pagination of result sets.
    /// </summary>
    /// <typeparam name="TEntity"></typeparam>
-   public class PagedPaginationProvider<TEntity> : IPaginationProvider<TEntity>
+   public class DefaultPaginationProvider<TEntity> : IPaginationProvider<TEntity>
    {
       private dynamic _defaultSort;
       private SortDirection _defaultSortDirection;
@@ -21,9 +21,10 @@ namespace Vibrant.QuerySearch
       /// <summary>
       /// Constructs an PagedPaginationProvider with a page size of 20.
       /// </summary>
-      public PagedPaginationProvider()
+      public DefaultPaginationProvider()
       {
          PageSize = 20;
+         MaxTake = 20;
          PredefinedPageSizes = new HashSet<int>();
          _parameter = Expression.Parameter( typeof( TEntity ), "x" );
       }
@@ -44,6 +45,11 @@ namespace Vibrant.QuerySearch
       public ICollection<int> PredefinedPageSizes { get; private set; }
 
       /// <summary>
+      /// Gets or sets the MaxTake.
+      /// </summary>
+      public int MaxTake { get; set; }
+
+      /// <summary>
       /// Applies the pagination form to the query.
       /// </summary>
       /// <param name="query">The query that should be paginated.</param>
@@ -51,9 +57,9 @@ namespace Vibrant.QuerySearch
       /// <returns>A pagination result.</returns>
       public PaginationResult<TEntity> ApplyPagination( IQueryable<TEntity> query, IPageForm form )
       {
-         var pageSize = GetPageSize( form );
          var page = form.GetPage();
          var skip = form.GetSkip();
+         var take = form.GetTake();
 
          var sorting = form.GetSorting( _parameter )?.ToList();
          if( sorting != null && sorting.Count > 0 )
@@ -72,22 +78,45 @@ namespace Vibrant.QuerySearch
             }
          }
 
-         int actualPage = 0;
-         if( page.HasValue )
+         if( Mode == PaginationMode.SkipAndTake )
          {
-            actualPage = page.Value;
-         }
-         else if( skip.HasValue )
-         {
-            actualPage = skip.Value / pageSize;
-         }
+            int actualSkip = 0;
+            if( skip.HasValue )
+            {
+               actualSkip = skip.Value;
+            }
 
-         return new PaginationResult<TEntity>(
-            actualPage * pageSize,
-            pageSize,
-            actualPage,
-            pageSize,
-            query.Skip( actualPage * pageSize ).Take( pageSize ) );
+            int actualTake = MaxTake;
+            if( take.HasValue && take.Value < MaxTake )
+            {
+               actualTake = MaxTake;
+            }
+
+            return new PaginationResult<TEntity>(
+               actualSkip,
+               actualTake,
+               query.Skip( actualSkip ).Take( actualTake ) );
+         }
+         else
+         {
+            var pageSize = GetPageSize( form );
+            int actualPage = 0;
+            if( page.HasValue )
+            {
+               actualPage = page.Value;
+            }
+            else if( skip.HasValue )
+            {
+               actualPage = skip.Value / pageSize;
+            }
+
+            return new PaginationResult<TEntity>(
+               actualPage * pageSize,
+               pageSize,
+               actualPage,
+               pageSize,
+               query.Skip( actualPage * pageSize ).Take( pageSize ) );
+         }
       }
 
       private int GetPageSize( IPageForm form )
@@ -107,7 +136,7 @@ namespace Vibrant.QuerySearch
                   throw new QuerySearchException( "The specified page size is not allowed." );
                }
                return pageSize.Value;
-            case PaginationMode.Any:
+            case PaginationMode.AnyPageSize:
                return form.GetPageSize() ?? PageSize;
             default:
                throw new QuerySearchException( $"Invalid PaginationMode configured: {Mode}." );
