@@ -1,5 +1,5 @@
 ﻿{
-   "version": "1.0.1-*",
+   "version": "2.0.0-*",
    "title": "QuerySearch for Entity Framework 7",
    "description": "Provides an asynchronous operations over the original Vibrant.QuerySearch library.",
    "authors": [ "MikaelGRA" ],
@@ -16,6 +16,6 @@
    },
    "dependencies": {
       "EntityFramework.Core": "7.0.0-rc1-final",
-      "Vibrant.QuerySearch": "1.0.1-*"
+      "Vibrant.QuerySearch": "2.0.0-*"
    }
 }
