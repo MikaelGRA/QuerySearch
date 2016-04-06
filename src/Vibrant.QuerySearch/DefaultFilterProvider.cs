@@ -117,7 +117,7 @@ namespace Vibrant.QuerySearch
          Expression<Func<TEntity, bool>> currentBody = null;
          if( textPredicate != null && keywordPredicate != null )
          {
-            currentBody = predicate1.Or( predicate2 );
+            currentBody = textPredicate.Or( keywordPredicate );
          }
          else if( textPredicate != null )
          {
