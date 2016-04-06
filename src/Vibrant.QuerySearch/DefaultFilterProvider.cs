@@ -81,35 +81,51 @@ namespace Vibrant.QuerySearch
          }
 
          // create predicate1 OR predicate2 as currentBody
-         Expression<Func<TEntity, bool>> currentBody = null;
+         Expression<Func<TEntity, bool>> textPredicate = null;
          if( predicate1 != null && predicate2 != null )
          {
-            currentBody = predicate1.Or( predicate2 );
+            textPredicate = predicate1.Or( predicate2 );
          }
          else if( predicate1 != null )
          {
-            currentBody = predicate1;
+            textPredicate = predicate1;
          }
          else if( predicate2 != null )
          {
-            currentBody = predicate2;
+            textPredicate = predicate2;
          }
 
          // All of the remaining filters are required
          var localizations = GetLocalizationDictionary();
+         Expression<Func<TEntity, bool>> keywordPredicate = null;
          foreach( var word in words )
          {
             Expression<Func<TEntity, bool>> predicate;
             if( _predefinedPredicates.TryGetValue( word, out predicate ) )
             {
-               currentBody = AddExpression( currentBody, predicate, ExpressionType.AndAlso );
+               keywordPredicate = AddExpression( keywordPredicate, predicate, ExpressionType.AndAlso );
             }
 
             Expression<Func<TEntity, bool>> localizedPredicate;
             if( localizations.TryGetValue( word, out localizedPredicate ) )
             {
-               currentBody = AddExpression( currentBody, localizedPredicate, ExpressionType.AndAlso );
+               keywordPredicate = AddExpression( keywordPredicate, localizedPredicate, ExpressionType.AndAlso );
             }
+         }
+
+         // create textPredicate OR keywordPredicate as currentBody
+         Expression<Func<TEntity, bool>> currentBody = null;
+         if( textPredicate != null && keywordPredicate != null )
+         {
+            currentBody = predicate1.Or( predicate2 );
+         }
+         else if( textPredicate != null )
+         {
+            currentBody = textPredicate;
+         }
+         else if( keywordPredicate != null )
+         {
+            currentBody = keywordPredicate;
          }
 
          var parameters = filteringForm.GetAdditionalFilters();
