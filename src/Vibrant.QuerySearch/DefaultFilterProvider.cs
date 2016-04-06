@@ -227,7 +227,7 @@ namespace Vibrant.QuerySearch
          Dictionary<string, Expression<Func<TEntity, bool>>> localizations;
          if( !_localizationToPredicate.TryGetValue( culture, out localizations ) )
          {
-            localizations = new Dictionary<string, Expression<Func<TEntity, bool>>>();
+            localizations = new Dictionary<string, Expression<Func<TEntity, bool>>>( StringComparer.OrdinalIgnoreCase );
             foreach( var kvp in _localizationKeyToPredicate )
             {
                var key = kvp.Key;
