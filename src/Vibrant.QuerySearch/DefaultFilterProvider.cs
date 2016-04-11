@@ -95,20 +95,25 @@ namespace Vibrant.QuerySearch
             currentBody = predicate2;
          }
 
-         // All of the remaining filters are required
          var localizations = GetLocalizationDictionary();
-         foreach( var word in words )
+         for( int i = 0 ; i < words.Length ; i++ )
          {
-            Expression<Func<TEntity, bool>> predicate;
-            if( _predefinedPredicates.TryGetValue( word, out predicate ) )
+            for( int j = i ; j < words.Length ; j++ )
             {
-               currentBody = AddExpression( currentBody, predicate, ExpressionType.AndAlso );
-            }
+               // from i to j
+               var word = string.Join( " ", words, i, j - i + 1 );
 
-            Expression<Func<TEntity, bool>> localizedPredicate;
-            if( localizations.TryGetValue( word, out localizedPredicate ) )
-            {
-               currentBody = AddExpression( currentBody, localizedPredicate, ExpressionType.AndAlso );
+               Expression<Func<TEntity, bool>> predicate;
+               if( _predefinedPredicates.TryGetValue( word, out predicate ) )
+               {
+                  currentBody = AddExpression( currentBody, predicate, ExpressionType.AndAlso );
+               }
+
+               Expression<Func<TEntity, bool>> localizedPredicate;
+               if( localizations.TryGetValue( word, out localizedPredicate ) )
+               {
+                  currentBody = AddExpression( currentBody, localizedPredicate, ExpressionType.AndAlso );
+               }
             }
          }
 
