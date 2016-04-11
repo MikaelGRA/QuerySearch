@@ -81,21 +81,22 @@ namespace Vibrant.QuerySearch
          }
 
          // create predicate1 OR predicate2 as currentBody
-         Expression<Func<TEntity, bool>> currentBody = null;
+         Expression<Func<TEntity, bool>> textPredicate = null;
          if( predicate1 != null && predicate2 != null )
          {
-            currentBody = predicate1.Or( predicate2 );
+            textPredicate = predicate1.Or( predicate2 );
          }
          else if( predicate1 != null )
          {
-            currentBody = predicate1;
+            textPredicate = predicate1;
          }
          else if( predicate2 != null )
          {
-            currentBody = predicate2;
+            textPredicate = predicate2;
          }
 
          var localizations = GetLocalizationDictionary();
+         Expression<Func<TEntity, bool>> keywordPredicate = null;
          for( int i = 0 ; i < words.Length ; i++ )
          {
             for( int j = i ; j < words.Length ; j++ )
@@ -106,15 +107,30 @@ namespace Vibrant.QuerySearch
                Expression<Func<TEntity, bool>> predicate;
                if( _predefinedPredicates.TryGetValue( word, out predicate ) )
                {
-                  currentBody = AddExpression( currentBody, predicate, ExpressionType.AndAlso );
+                  keywordPredicate = AddExpression( keywordPredicate, predicate, ExpressionType.AndAlso );
                }
 
                Expression<Func<TEntity, bool>> localizedPredicate;
                if( localizations.TryGetValue( word, out localizedPredicate ) )
                {
-                  currentBody = AddExpression( currentBody, localizedPredicate, ExpressionType.AndAlso );
+                  keywordPredicate = AddExpression( keywordPredicate, localizedPredicate, ExpressionType.AndAlso );
                }
             }
+         }
+
+         // create textPredicate OR keywordPredicate as currentBody
+         Expression<Func<TEntity, bool>> currentBody = null;
+         if( textPredicate != null && keywordPredicate != null )
+         {
+            currentBody = textPredicate.Or( keywordPredicate );
+         }
+         else if( textPredicate != null )
+         {
+            currentBody = textPredicate;
+         }
+         else if( keywordPredicate != null )
+         {
+            currentBody = keywordPredicate;
          }
 
          var parameters = filteringForm.GetAdditionalFilters();
@@ -216,7 +232,7 @@ namespace Vibrant.QuerySearch
          Dictionary<string, Expression<Func<TEntity, bool>>> localizations;
          if( !_localizationToPredicate.TryGetValue( culture, out localizations ) )
          {
-            localizations = new Dictionary<string, Expression<Func<TEntity, bool>>>();
+            localizations = new Dictionary<string, Expression<Func<TEntity, bool>>>( StringComparer.OrdinalIgnoreCase );
             foreach( var kvp in _localizationKeyToPredicate )
             {
                var key = kvp.Key;
