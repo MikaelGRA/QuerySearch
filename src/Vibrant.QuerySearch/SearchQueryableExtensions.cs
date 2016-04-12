@@ -20,6 +20,20 @@ namespace Vibrant.QuerySearch
       /// <returns>A QuerySearchResult that contains the result of the search.</returns>
       public static QuerySearchResult<TEntity> Search<TEntity>( this IQueryable<TEntity> query, ISearchForm search )
       {
+         return query.Search( search, null );
+      }
+
+
+      /// <summary>
+      /// Searches the specfied queryable for entities using the provided search form.
+      /// </summary>
+      /// <typeparam name="TEntity">The type of entities to look for.</typeparam>
+      /// <param name="query">The queryable that should be searched.</param>
+      /// <param name="search">The search form that should be used to search the query.</param>
+      /// <param name="postCountProcessesing">Function to be called after processing the count portions of the query. Often used to add navigation inclusions.</param>
+      /// <returns>A QuerySearchResult that contains the result of the search.</returns>
+      public static QuerySearchResult<TEntity> Search<TEntity>( this IQueryable<TEntity> query, ISearchForm search, Func<IQueryable<TEntity>, IQueryable<TEntity>> postCountProcessesing )
+      {
          if( query == null )
             throw new ArgumentNullException( nameof( query ) );
          if( search == null )
@@ -42,6 +56,11 @@ namespace Vibrant.QuerySearch
          query = filterProvider.ApplyWhere( query, search );
 
          var filteredCount = query.Count();
+
+         if( postCountProcessesing != null )
+         {
+            query = postCountProcessesing( query );
+         }
 
          var result = paginationProvider.ApplyPagination( query, search );
 
