@@ -16,6 +16,8 @@ namespace Vibrant.QuerySearch
    {
       private dynamic _defaultSort;
       private SortDirection _defaultSortDirection;
+      private dynamic _uniqueSort;
+      private SortDirection _uniqueSortDirection;
       private ParameterExpression _parameter;
 
       /// <summary>
@@ -65,6 +67,14 @@ namespace Vibrant.QuerySearch
          if( sorting != null && sorting.Count > 0 )
          {
             query = query.OrderBy( _parameter, sorting );
+            if(_uniqueSortDirection == SortDirection.Ascending )
+            {
+               query = Queryable.ThenBy( (IOrderedQueryable<TEntity>)query, _uniqueSort ?? _defaultSort );
+            }
+            else
+            {
+               query = Queryable.ThenByDescending( (IOrderedQueryable<TEntity>)query, _uniqueSort ?? _defaultSort );
+            }
          }
          else
          {
@@ -153,6 +163,18 @@ namespace Vibrant.QuerySearch
       {
          _defaultSort = defaultSort;
          _defaultSortDirection = direction;
+      }
+
+      /// <summary>
+      /// Registers a unique sorting behaviour.
+      /// </summary>
+      /// <typeparam name="TKey"></typeparam>
+      /// <param name="uniqueSort">An expression representing the unique sorting.</param>
+      /// <param name="direction">The direction of the default sorting.</param>
+      public void RegisterUniqueSort<TKey>( Expression<Func<TEntity, TKey>> uniqueSort, SortDirection direction = SortDirection.Ascending )
+      {
+         _uniqueSort = uniqueSort;
+         _uniqueSortDirection = direction;
       }
    }
 }
