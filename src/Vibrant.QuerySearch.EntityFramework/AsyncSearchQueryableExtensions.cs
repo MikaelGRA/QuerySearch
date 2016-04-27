@@ -71,8 +71,8 @@ namespace Vibrant.QuerySearch.EntityFramework
          {
             FullCount = fullCount,
             FilteredCount = filteredCount,
-            FullPageCount = PaginationHelper.GetPageCount( fullCount, result.Page ),
-            FilteredPageCount = PaginationHelper.GetPageCount( filteredCount, result.Page ),
+            FullPageCount = PaginationHelper.GetPageCount( fullCount, result.PageSize ),
+            FilteredPageCount = PaginationHelper.GetPageCount( filteredCount, result.PageSize ),
             Page = result.Page,
             Skip = result.Skip,
             Take = result.Take,

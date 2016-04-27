@@ -51,6 +51,40 @@ namespace Vibrant.QuerySearch
       /// </summary>
       public int MaxTake { get; set; }
 
+      private IOrderedQueryable<TEntity> ApplyOrdering(
+         IQueryable<TEntity> query,
+         dynamic sort,
+         SortDirection direction,
+         ref bool isSorted )
+      {
+         if( isSorted )
+         {
+            if( direction == SortDirection.Ascending )
+            {
+               query = Queryable.ThenBy( (IOrderedQueryable<TEntity>)query, sort );
+            }
+            else
+            {
+               query = Queryable.ThenByDescending( (IOrderedQueryable<TEntity>)query, sort );
+            }
+         }
+         else
+         {
+            if( direction == SortDirection.Ascending )
+            {
+               query = Queryable.OrderBy( query, sort );
+            }
+            else
+            {
+               query = Queryable.OrderByDescending( query, sort );
+            }
+         }
+
+         isSorted = true;
+
+         return (IOrderedQueryable<TEntity>)query;
+      }
+
       /// <summary>
       /// Applies the pagination form to the query.
       /// </summary>
@@ -62,29 +96,38 @@ namespace Vibrant.QuerySearch
          var page = form.GetPage();
          var skip = form.GetSkip();
          var take = form.GetTake();
+         bool isSorted = false;
 
          var sorting = form.GetSorting( _parameter )?.ToList();
          if( sorting != null && sorting.Count > 0 )
          {
+            // first order by user specified sorting
             query = query.OrderBy( _parameter, sorting );
-            if(_uniqueSortDirection == SortDirection.Ascending )
+
+            if( _uniqueSort != null )
             {
-               query = Queryable.ThenBy( (IOrderedQueryable<TEntity>)query, _uniqueSort ?? _defaultSort );
+               query = ApplyOrdering( query, _uniqueSort, _uniqueSortDirection, ref isSorted );
             }
-            else
+            else if( _defaultSort != null )
             {
-               query = Queryable.ThenByDescending( (IOrderedQueryable<TEntity>)query, _uniqueSort ?? _defaultSort );
+               query = ApplyOrdering( query, _defaultSort, _defaultSortDirection, ref isSorted );
             }
          }
          else
          {
-            if( _defaultSortDirection == SortDirection.Ascending )
+            // first order by default sorting
+            if( _defaultSort != null )
             {
-               query = Queryable.OrderBy( query, _defaultSort );
+               query = ApplyOrdering( query, _defaultSort, _defaultSortDirection, ref isSorted );
             }
-            else
+
+            // then order by unique sorting, if present, and not equal to unique sorting
+            if( _uniqueSort != null )
             {
-               query = Queryable.OrderByDescending( query, _defaultSort );
+               if( !( _uniqueSort == _defaultSort && _uniqueSortDirection == _defaultSortDirection ) )
+               {
+                  query = ApplyOrdering( query, _uniqueSort, _uniqueSortDirection, ref isSorted );
+               }
             }
          }
 
@@ -159,10 +202,16 @@ namespace Vibrant.QuerySearch
       /// <typeparam name="TKey"></typeparam>
       /// <param name="defaultSort">An expression representing the default sorting.</param>
       /// <param name="direction">The direction of the default sorting.</param>
-      public void RegisterDefaultSort<TKey>( Expression<Func<TEntity, TKey>> defaultSort, SortDirection direction = SortDirection.Ascending )
+      public void RegisterDefaultSort<TKey>( Expression<Func<TEntity, TKey>> defaultSort, SortDirection direction = SortDirection.Ascending, bool isAlsoUniqueSort = true )
       {
          _defaultSort = defaultSort;
          _defaultSortDirection = direction;
+
+         if( isAlsoUniqueSort )
+         {
+            _uniqueSort = defaultSort;
+            _uniqueSortDirection = direction;
+         }
       }
 
       /// <summary>
