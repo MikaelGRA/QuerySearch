@@ -1,5 +1,5 @@
 {
-   "version": "2.0.1-*",
+   "version": "2.0.0-*",
    "title": "Unity DependencyResolver for QuerySearch",
    "description": "Provides an implementation of IDependencyResolver implemented using Unity.",
    "authors": [ "MikaelGRA" ],
