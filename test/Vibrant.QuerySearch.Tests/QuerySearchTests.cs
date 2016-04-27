@@ -19,7 +19,7 @@ namespace Vibrant.QuerySearch.Tests
 
    public class MyObjectPaginationProvider : DefaultPaginationProvider<MyObject>
    {
-      public MyObjectPaginationProvider( 
+      public MyObjectPaginationProvider(
          Expression<Func<MyObject, object>> defaultSort,
          Expression<Func<MyObject, object>> uniqueSort )
       {
@@ -28,13 +28,20 @@ namespace Vibrant.QuerySearch.Tests
          RegisterDefaultSort( defaultSort );
          RegisterUniqueSort( uniqueSort );
       }
+
+      public MyObjectPaginationProvider( Expression<Func<MyObject, object>> defaultSort )
+      {
+         Mode = PaginationMode.AnyPageSize;
+
+         RegisterDefaultSort( defaultSort, SortDirection.Ascending, true );
+      }
    }
 
    public class QuerySearchTests
    {
       public QuerySearchTests()
       {
-         
+
       }
 
       private List<MyObject> CreateCollection()
@@ -50,14 +57,21 @@ namespace Vibrant.QuerySearch.Tests
          };
       }
 
-      private void BootstrapDependencies( Expression<Func<MyObject, object>> defaultSort, Expression<Func<MyObject, object>> uniqueSort )
+      private void BootstrapDependencies( Expression<Func<MyObject, object>> defaultSort, Expression<Func<MyObject, object>> uniqueSort = null )
       {
          var container = new UnityContainer();
          var localization = new DefaultLocalizationService();
 
          container.RegisterInstance<ILocalizationService>( localization );
          container.RegisterInstance<IFilterProvider<MyObject>>( new MyObjectFilterProvider( localization ) );
-         container.RegisterInstance<IPaginationProvider<MyObject>>( new MyObjectPaginationProvider( defaultSort, uniqueSort ) );
+         if( uniqueSort == null )
+         {
+            container.RegisterInstance<IPaginationProvider<MyObject>>( new MyObjectPaginationProvider( defaultSort ) );
+         }
+         else
+         {
+            container.RegisterInstance<IPaginationProvider<MyObject>>( new MyObjectPaginationProvider( defaultSort, uniqueSort ) );
+         }
 
          DependencyResolver.Current = new UnityDependencyResolver( container );
       }
@@ -82,6 +96,41 @@ namespace Vibrant.QuerySearch.Tests
          {
             Page = page,
             PageSize = pageSize,
+         } );
+
+         // Assert
+         Assert.Equal( expected.Count, result.Items.Count );
+         for( int i = 0 ; i < expected.Count ; i++ )
+         {
+            var expectedItem = expected[ i ];
+            var actualItem = result.Items[ i ];
+
+            Assert.Equal( expectedItem.Id, actualItem.Id );
+            Assert.Equal( expectedItem.Text, actualItem.Text );
+         }
+      }
+
+      [Theory]
+      [InlineData( 0, 3 )]
+      [InlineData( 1, 3 )]
+      public void Should_Be_Sorted_Correctly_With_Text_Sort( int page, int pageSize )
+      {
+         // Arrange
+         BootstrapDependencies( x => x.Id );
+         var collection = CreateCollection().AsQueryable();
+         var expected = CreateCollection()
+            .OrderByDescending( x => x.Text )
+            .ThenBy( x => x.Id )
+            .Skip( page * pageSize )
+            .Take( pageSize )
+            .ToList();
+
+         // Act
+         var result = collection.Search( new SearchForm
+         {
+            Page = page,
+            PageSize = pageSize,
+            OrderBy = "Text DESC"
          } );
 
          // Assert

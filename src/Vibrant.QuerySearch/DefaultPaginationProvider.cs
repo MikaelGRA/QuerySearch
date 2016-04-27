@@ -103,6 +103,7 @@ namespace Vibrant.QuerySearch
          {
             // first order by user specified sorting
             query = query.OrderBy( _parameter, sorting );
+            isSorted = true;
 
             if( _uniqueSort != null )
             {
