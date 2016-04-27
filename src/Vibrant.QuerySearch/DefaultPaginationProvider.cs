@@ -124,7 +124,7 @@ namespace Vibrant.QuerySearch
             // then order by unique sorting, if present, and not equal to unique sorting
             if( _uniqueSort != null )
             {
-               if( !( _uniqueSort == _defaultSort && _uniqueSortDirection == _defaultSortDirection ) )
+               if( !( ReferenceEquals( _uniqueSort, _defaultSort ) && _uniqueSortDirection == _defaultSortDirection ) )
                {
                   query = ApplyOrdering( query, _uniqueSort, _uniqueSortDirection, ref isSorted );
                }
