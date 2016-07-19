@@ -142,7 +142,7 @@ namespace Vibrant.QuerySearch
                var memberAccessor = memberAccess.MemberAccessor;
                var propertyType = memberAccess.MemberType;
                var unwrappedPropertyType = propertyType.GetTypeInfo().IsGenericType && propertyType.GetGenericTypeDefinition() == typeof( Nullable<> )
-                  ? propertyType.GenericTypeArguments[ 0 ]
+                  ? propertyType.GetGenericArguments()[ 0 ]
                   : propertyType;
                var propertyValue = propertyComparison.GetValue();
                var convertedPropertyValue = Convert.ChangeType( propertyValue, unwrappedPropertyType );
