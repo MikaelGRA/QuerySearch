@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Resources;
 using System.Text;
 using Vibrant.QuerySearch.Helpers;
 
@@ -143,7 +142,7 @@ namespace Vibrant.QuerySearch
                var memberAccessor = memberAccess.MemberAccessor;
                var propertyType = memberAccess.MemberType;
                var unwrappedPropertyType = propertyType.GetTypeInfo().IsGenericType && propertyType.GetGenericTypeDefinition() == typeof( Nullable<> )
-                  ? propertyType.GetGenericArguments()[ 0 ]
+                  ? propertyType.GenericTypeArguments[ 0 ]
                   : propertyType;
                var propertyValue = propertyComparison.GetValue();
                var convertedPropertyValue = Convert.ChangeType( propertyValue, unwrappedPropertyType );

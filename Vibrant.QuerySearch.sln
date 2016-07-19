@@ -13,7 +13,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Vibrant.QuerySearch.Unity",
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Vibrant.QuerySearch.EntityFramework", "src\Vibrant.QuerySearch.EntityFramework\Vibrant.QuerySearch.EntityFramework.xproj", "{9B3B9D40-6F49-4844-A557-8EE900610FA3}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Vibrant.QuerySearch.EntityFramework7", "src\Vibrant.QuerySearch.EntityFramework7\Vibrant.QuerySearch.EntityFramework7.xproj", "{EAE5459B-6372-40BC-BFCB-C5FE3F3EF137}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Vibrant.QuerySearch.EntityFrameworkCore", "src\Vibrant.QuerySearch.EntityFrameworkCore\Vibrant.QuerySearch.EntityFrameworkCore.xproj", "{EAE5459B-6372-40BC-BFCB-C5FE3F3EF137}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
