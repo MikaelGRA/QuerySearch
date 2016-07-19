@@ -18,5 +18,18 @@
    "dependencies": {
       "Microsoft.EntityFrameworkCore": "1.0.0",
       "Vibrant.QuerySearch": "3.0.0-*"
+   },
+   "scripts": {
+      "postcompile": [
+         "dotnet pack --no-build --configuration %compile:Configuration%"
+      ]
+   },
+   "configurations": {
+      "Release": {
+         "buildOptions": {
+            "optimize": true,
+            "xmlDoc": true
+         }
+      }
    }
 }

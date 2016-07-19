@@ -25,5 +25,18 @@
             "System.Reflection.TypeExtensions": "4.1.0"
          }
       }
+   },
+   "scripts": {
+      "postcompile": [
+         "dotnet pack --no-build --configuration %compile:Configuration%"
+      ]
+   },
+   "configurations": {
+      "Release": {
+         "buildOptions": {
+            "optimize": true,
+            "xmlDoc": true
+         }
+      }
    }
 }
