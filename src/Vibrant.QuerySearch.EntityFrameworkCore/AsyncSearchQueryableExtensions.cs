@@ -44,11 +44,11 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
          if( registry == null )
             throw new QuerySearchException( "No dependency resolver has been specified." );
 
-         var filterProvider = DependencyResolver.Current.Resolve<IFilterProvider<TEntity>>();
+         var filterProvider = registry.Resolve<IQuerySearchProvider<TEntity>>() ?? registry.Resolve<IFilterProvider<TEntity>>();
          if( filterProvider == null )
             throw new QuerySearchException( $"No IFilterProvider has been registered for the type '{typeof( TEntity ).FullName}'." );
 
-         var paginationProvider = DependencyResolver.Current.Resolve<IPaginationProvider<TEntity>>();
+         var paginationProvider = registry.Resolve<IQuerySearchProvider<TEntity>>() ?? registry.Resolve<IPaginationProvider<TEntity>>();
          if( paginationProvider == null )
             throw new QuerySearchException( $"No IPaginationProvider has been registered for the type '{typeof( TEntity ).FullName}'." );
 

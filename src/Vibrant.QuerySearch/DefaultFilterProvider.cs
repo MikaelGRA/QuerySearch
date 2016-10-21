@@ -27,6 +27,7 @@ namespace Vibrant.QuerySearch
    /// </list>
    /// </summary>
    /// <typeparam name="TEntity"></typeparam>
+   [Obsolete( "Use DefaultQuerySearchProvider instead." )]
    public class DefaultFilterProvider<TEntity> : IFilterProvider<TEntity>
    {
       private Dictionary<string, Expression<Func<TEntity, bool>>> _predefinedPredicates;

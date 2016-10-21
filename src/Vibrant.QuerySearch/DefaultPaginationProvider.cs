@@ -12,6 +12,7 @@ namespace Vibrant.QuerySearch
    /// An implenentation of IPaginationProvider that forces exact pagination of result sets.
    /// </summary>
    /// <typeparam name="TEntity"></typeparam>
+   [Obsolete( "Use DefaultQuerySearchProvider instead." )]
    public class DefaultPaginationProvider<TEntity> : IPaginationProvider<TEntity>
    {
       private dynamic _defaultSort;

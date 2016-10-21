@@ -93,5 +93,33 @@ namespace Vibrant.QuerySearch.Unity
       {
          registry.RegisterType<IPaginationProvider<TEntity>, TPaginationProvider>();
       }
+
+      /// <summary>
+      /// Registers a query search provider.
+      /// </summary>
+      /// <typeparam name="TEntity"></typeparam>
+      /// <typeparam name="TQuerySearchProvider"></typeparam>
+      /// <param name="registry"></param>
+      /// <param name="lifetimeManager"></param>
+      public static void RegisterQuerySearchProvider<TEntity, TQuerySearchProvider>(
+         this IUnityContainer registry,
+         LifetimeManager lifetimeManager )
+         where TQuerySearchProvider : IQuerySearchProvider<TEntity>
+      {
+         registry.RegisterType<IQuerySearchProvider<TEntity>, TQuerySearchProvider>( lifetimeManager );
+      }
+
+      /// <summary>
+      /// Registers a query search provider.
+      /// </summary>
+      /// <typeparam name="TEntity"></typeparam>
+      /// <typeparam name="TQuerySearchProvider"></typeparam>
+      /// <param name="registry"></param>
+      public static void RegisterQuerySearchProvider<TEntity, TQuerySearchProvider>(
+         this IUnityContainer registry )
+         where TQuerySearchProvider : IQuerySearchProvider<TEntity>
+      {
+         registry.RegisterType<IQuerySearchProvider<TEntity>, TQuerySearchProvider>();
+      }
    }
 }
