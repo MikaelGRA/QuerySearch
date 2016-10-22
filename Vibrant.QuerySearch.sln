@@ -20,6 +20,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		global.json = global.json
 	EndProjectSection
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Vibrant.QuerySearch.ConsoleApp", "test\Vibrant.QuerySearch.ConsoleApp\Vibrant.QuerySearch.ConsoleApp.xproj", "{5D7C8006-A2E3-44EB-94DE-B19A39F21808}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +44,10 @@ Global
 		{EAE5459B-6372-40BC-BFCB-C5FE3F3EF137}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EAE5459B-6372-40BC-BFCB-C5FE3F3EF137}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EAE5459B-6372-40BC-BFCB-C5FE3F3EF137}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D7C8006-A2E3-44EB-94DE-B19A39F21808}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D7C8006-A2E3-44EB-94DE-B19A39F21808}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D7C8006-A2E3-44EB-94DE-B19A39F21808}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D7C8006-A2E3-44EB-94DE-B19A39F21808}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -51,5 +57,6 @@ Global
 		{9BB1A293-213C-4A1B-AB81-E5D305C7A6ED} = {3059BB00-E0A0-4C19-B331-848A1794AD93}
 		{9B3B9D40-6F49-4844-A557-8EE900610FA3} = {3059BB00-E0A0-4C19-B331-848A1794AD93}
 		{EAE5459B-6372-40BC-BFCB-C5FE3F3EF137} = {3059BB00-E0A0-4C19-B331-848A1794AD93}
+		{5D7C8006-A2E3-44EB-94DE-B19A39F21808} = {9468A0D5-D3A5-4A13-84B5-C8C983830131}
 	EndGlobalSection
 EndGlobal

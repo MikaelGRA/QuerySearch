@@ -107,11 +107,8 @@ namespace Vibrant.QuerySearch
       /// <param name="query">The query that should be paginated.</param>
       /// <param name="form">The pagination form that should be applied to the query.</param>
       /// <returns>A pagination result.</returns>
-      public PaginationResult<TEntity> ApplyPagination( IQueryable<TEntity> query, IPageForm form )
+      public virtual PaginationResult<TEntity> ApplyPagination( IQueryable<TEntity> query, IPageForm form )
       {
-         var page = form.GetPage();
-         var skip = form.GetSkip();
-         var take = form.GetTake();
          bool isSorted = false;
 
          var sorting = form.GetSorting( _parameter )?.ToList();
@@ -148,6 +145,15 @@ namespace Vibrant.QuerySearch
             }
          }
 
+         return CreatePaginationResult( query, form, true );
+      }
+
+      protected PaginationResult<TEntity> CreatePaginationResult( IQueryable<TEntity> query, IPageForm form, bool applyPagination )
+      {
+         var page = form.GetPage();
+         var skip = form.GetSkip();
+         var take = form.GetTake();
+
          if( Mode == PaginationMode.SkipAndTake )
          {
             int actualSkip = 0;
@@ -165,7 +171,7 @@ namespace Vibrant.QuerySearch
             return new PaginationResult<TEntity>(
                actualSkip,
                actualTake,
-               query.Skip( actualSkip ).Take( actualTake ) );
+               applyPagination ? query.Skip( actualSkip ).Take( actualTake ) : query );
          }
          else
          {
@@ -185,11 +191,11 @@ namespace Vibrant.QuerySearch
                pageSize,
                actualPage,
                pageSize,
-               query.Skip( actualPage * pageSize ).Take( pageSize ) );
+               applyPagination ? query.Skip( actualPage * pageSize ).Take( pageSize ) : query );
          }
       }
 
-      private int GetPageSize( IPageForm form )
+      protected int GetPageSize( IPageForm form )
       {
          switch( Mode )
          {
@@ -249,7 +255,7 @@ namespace Vibrant.QuerySearch
       /// <param name="query">The IQueryable that is to be filtered.</param>
       /// <param name="filteringForm">The filtering form.</param>
       /// <returns>A filtered IQueryable.</returns>
-      public IQueryable<TEntity> ApplyWhere( IQueryable<TEntity> query, IFilterForm filteringForm )
+      public virtual IQueryable<TEntity> ApplyWhere( IQueryable<TEntity> query, IFilterForm filteringForm )
       {
          var term = filteringForm.GetTerm();
          var words = GetWords( term );

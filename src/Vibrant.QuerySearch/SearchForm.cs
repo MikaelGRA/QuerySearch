@@ -38,6 +38,11 @@ namespace Vibrant.QuerySearch
       public string OrderBy { get; set; }
 
       /// <summary>
+      /// Gets or sets a bool indicating if results should be ranked by the term.
+      /// </summary>
+      public bool OrderByTerm { get; set; }
+
+      /// <summary>
       /// Gets or sets the user provided search term.
       /// </summary>
       public string Term { get; set; }
@@ -112,6 +117,14 @@ namespace Vibrant.QuerySearch
             return ExpressionHelper.CalculateSortMemberAccesses( parameter, OrderBy );
          }
          return null;
+      }
+
+      /// <summary>
+      /// Gets or sets a bool indicating if results should be ranked by the term.
+      /// </summary>
+      public bool SortByTermRank()
+      {
+         return OrderByTerm;
       }
    }
 }

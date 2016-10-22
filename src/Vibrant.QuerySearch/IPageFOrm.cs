@@ -37,6 +37,12 @@ namespace Vibrant.QuerySearch
       int? GetPageSize();
 
       /// <summary>
+      /// Gets a bool indicating if term rank should determine result ordering.
+      /// </summary>
+      /// <returns></returns>
+      bool SortByTermRank();
+
+      /// <summary>
       /// Gets the sorting to be used.
       /// </summary>
       /// <returns></returns>

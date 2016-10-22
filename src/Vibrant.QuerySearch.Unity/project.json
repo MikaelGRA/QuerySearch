@@ -1,5 +1,5 @@
 {
-   "version": "3.1.0-*",
+   "version": "3.4.0-*",
    "title": "Unity DependencyResolver for QuerySearch",
    "description": "Provides an implementation of IDependencyResolver implemented using Unity.",
    "authors": [ "MikaelGRA" ],
@@ -25,7 +25,7 @@
       }
    },
    "dependencies": {
-      "Vibrant.QuerySearch": "3.1.0-*"
+      "Vibrant.QuerySearch": "3.4.0-*"
    },
    "scripts": {
       "postcompile": [
