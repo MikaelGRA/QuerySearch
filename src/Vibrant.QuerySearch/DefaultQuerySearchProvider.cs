@@ -27,7 +27,7 @@ namespace Vibrant.QuerySearch
       private Func<string, Expression<Func<TEntity, bool>>> _getFreeSentencePredicate;
       private Dictionary<CultureInfo, Dictionary<string, Expression<Func<TEntity, bool>>>> _localizationToPredicate;
       private Dictionary<string, Expression<Func<TEntity, bool>>> _localizationKeyToPredicate;
-      private Func<IQueryable<TEntity>, IQueryable<TEntity>> _applyWhere;
+      private Func<string, Func<IQueryable<TEntity>, IQueryable<TEntity>>> _getApplyWhere;
 
       private ILocalizationService _localizationService;
 
@@ -254,9 +254,10 @@ namespace Vibrant.QuerySearch
          var term = filteringForm.GetTerm();
          var words = GetWords( term );
 
-         if( _applyWhere != null )
+         if( _getApplyWhere != null && term != null )
          {
-            query = _applyWhere( query );
+            var applyWhere = _getApplyWhere( term );
+            query = applyWhere( query );
          }
 
          // create predicate1 (word expressions)
@@ -424,10 +425,10 @@ namespace Vibrant.QuerySearch
       /// <summary>
       /// Registers an 'ApplyWhere' functions that will be executed on all queries.
       /// </summary>
-      /// <param name="applyWhere">This is a function that executes a filtering function.</param>
-      public void RegisterApplyWhere( Func<IQueryable<TEntity>, IQueryable<TEntity>> applyWhere )
+      /// <param name="getApplyWhere">This is a function that executes a filtering function.</param>
+      public void RegisterApplyWhere( Func<string, Func<IQueryable<TEntity>, IQueryable<TEntity>>> getApplyWhere )
       {
-         _applyWhere = applyWhere;
+         _getApplyWhere = getApplyWhere;
       }
 
       private Dictionary<string, Expression<Func<TEntity, bool>>> GetLocalizationDictionary()
