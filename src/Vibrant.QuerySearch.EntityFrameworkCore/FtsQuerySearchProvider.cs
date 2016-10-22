@@ -237,7 +237,7 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
             string parameter = rawSql.Substring( parameterStart, parameterEnd - parameterStart );
 
             var finalSql = rawSql.Replace( parameter, "{0}" );
-            return CreatePaginationResult( untouchedQuery.FromSql( rawSql ), form, false );
+            return CreatePaginationResult( untouchedQuery.FromSql( finalSql, parameter ), form, false );
          }
          else
          {
