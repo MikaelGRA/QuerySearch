@@ -1,5 +1,5 @@
 ﻿{
-   "version": "3.4.0-*",
+   "version": "3.4.1-*",
    "title": "QuerySearch for Entity Framework Core",
    "description": "Provides an asynchronous operations over the original Vibrant.QuerySearch library.",
    "authors": [ "MikaelGRA" ],

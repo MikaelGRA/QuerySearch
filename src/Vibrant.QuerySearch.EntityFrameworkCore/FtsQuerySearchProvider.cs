@@ -48,7 +48,7 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
 
       private string CreateBaseQuery()
       {
-         return $"SELECT * FROM {GetTableName()} AS {TableAlias} INNER JOIN FREETEXTTABLE({GetTableName()}, {string.Join( ", ", GetTermColumnNames() )}, {{0}} ) AS {KeyTable} ON {TableAlias}.{GetKeyColumnName()} = {KeyTable}.[KEY]";
+         return $"SELECT * FROM {GetTableName()} AS {TableAlias} INNER JOIN FREETEXTTABLE({GetTableName()}, ({string.Join( ", ", GetTermColumnNames() )}), {{0}} ) AS {KeyTable} ON {TableAlias}.{GetKeyColumnName()} = {KeyTable}.[KEY]";
       }
 
       private string CreateOrderBy( int offset, int fetch )
@@ -166,6 +166,8 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
                {
                   // this line marks the start of WHERE/ORDER BY/WHATEVER of the outer query
                   usedAlias = line.Substring( 5 );
+
+                  // we ONLY care about the 'ORDER BY' of the outer query, so dont include more lines until we reach that (TODO: what about joins?)
                   iteratingRelevantSql = false;
                }
                else if( line.StartsWith( "ORDER BY" ) )
