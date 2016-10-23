@@ -234,7 +234,7 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
             var rawSql = builder.Replace( usedAlias, TableAlias ).ToString();
 
             // parameterize the final sql
-            int parameterStart = rawSql.IndexOf( "], N'" ) + 3;
+            int parameterStart = rawSql.IndexOf( ", N'" ) + 2;
             int parameterEnd = rawSql.IndexOf( "' ) AS" ) + 1;
             string parameter = rawSql.Substring( parameterStart, parameterEnd - parameterStart );
 
