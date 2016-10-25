@@ -132,14 +132,20 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
             // keep track of the untouched query
             var untouchedQuery = query;
 
+            // apply where clause again (so we the outer query will be 'complete', and can simply replace what comes after the SELECT of the inner query)
+            query = base.ApplyWhere( query, filteringForm );
+
             // if we are not sorting by the term, we should simply use the default mechanism
+            bool isAlreadySorted = false;
             if( !form.SortByTermRank() )
             {
+               isAlreadySorted = true;
+
                var result = base.ApplyPagination( query, form );
                query = result.Query;
             }
 
-            // get the sql of the query
+            // get the sql of the query (WHERE + JOIN + ORDER BY, etc.)
             var sql = query.ToSql();
 
             // create a reader for our sql, and a builder to build a new query
@@ -151,44 +157,33 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
 
             // variable to keep track of whether or not the sql line we are iterating should be part of the new sql statement
             bool iteratingRelevantSql = false;
-            bool iteratingOrderBySql = false;
 
             string line = null;
             while( ( line = reader.ReadLine() ) != null )
             {
-               // TODO: Should probably use logic here to determine correct alias
                if( line == "FROM (" )
                {
+                  // read our base query
+                  var baseQuery = reader.ReadLine();
+                  builder.AppendLine( baseQuery );
+
                   // this line marks the start of the sub query
-                  iteratingRelevantSql = true;
                }
                else if( line.StartsWith( ") AS " ) )
                {
                   // this line marks the start of WHERE/ORDER BY/WHATEVER of the outer query
                   usedAlias = line.Substring( 5 );
 
-                  // we ONLY care about the 'ORDER BY' of the outer query, so dont include more lines until we reach that (TODO: what about joins?)
-                  iteratingRelevantSql = false;
-               }
-               else if( line.StartsWith( "ORDER BY" ) )
-               {
-                  // this line marks the start of the order by portion of the outer query
-                  iteratingOrderBySql = true;
-                  iteratingRelevantSql = false;
+                  iteratingRelevantSql = true;
                }
                else if( iteratingRelevantSql )
-               {
-                  builder.AppendLine( line );
-               }
-
-               if( iteratingOrderBySql )
                {
                   builder.AppendLine( line );
                }
             }
 
             // if we have NOT already appended a OFFSET/FETCH query part, do that now
-            if( !iteratingOrderBySql )
+            if( !isAlreadySorted )
             {
                // calculate fetch and offset
                int fetch = 0;
