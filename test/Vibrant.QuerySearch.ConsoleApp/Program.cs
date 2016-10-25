@@ -20,7 +20,7 @@ namespace Vibrant.QuerySearch.ConsoleApp
 
          DependencyResolver.Current = new DependencyResolverImpl( provider );
 
-         Console.ReadKey();
+         Console.WriteLine( "Whatever" );
       }
    }
 
