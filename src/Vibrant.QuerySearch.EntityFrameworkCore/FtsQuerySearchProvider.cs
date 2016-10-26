@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,8 +16,15 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
    public abstract class FtsQuerySearchProvider<TEntity> : DefaultQuerySearchProvider<TEntity>
       where TEntity : class
    {
+      private static readonly char[] SplitChars = new[] { ' ', '\t', '\r', '\n' };
+
       private static readonly string TableAlias = "[ftst]";
       private static readonly string KeyTable = "[KEY_TBL]";
+
+      /// <summary>
+      /// Gets or sets the full text index search mode to use.
+      /// </summary>
+      public FtsSearchMode SearchMode { get; protected set; }
 
       /// <summary>
       /// Constructs an FtsQuerySearchProvider.
@@ -24,11 +32,6 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
       public FtsQuerySearchProvider( ILocalizationService localization ) : base( localization )
       {
       }
-
-      /// <summary>
-      /// Gets the columns that are indexed with fulltext indices.
-      /// </summary>
-      protected abstract string[] GetTermColumnNames();
 
       /// <summary>
       /// Gets the name of the table that this table is placed in. Example: [BlogPost]
@@ -46,9 +49,47 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
       /// </summary>
       protected abstract string GetUniqueColumnSort();
 
+      private string GetSearchExpression( string term )
+      {
+         if( SearchMode == FtsSearchMode.FreeText )
+         {
+            return term;
+         }
+         else
+         {
+            if( string.IsNullOrWhiteSpace( term ) )
+            {
+               return null;
+            }
+
+            var words = term.Split( SplitChars, StringSplitOptions.RemoveEmptyEntries );
+            if(words.Length == 0 )
+            {
+               return null;
+            }
+
+            var maxLength = words.Max( x => x.Length );
+            var isAbout = $"ISABOUT({string.Join( ", ", words.Select( x => "\"" + x.Replace( "\"", "" ) + "*\" WEIGHT (" + ( (double)x.Length / maxLength ).ToString( "0.##", CultureInfo.InvariantCulture ) + ")" ) )})";
+            return isAbout;
+         }
+      }
+
+      private string GetSearchTable()
+      {
+         switch( SearchMode )
+         {
+            case FtsSearchMode.FreeText:
+               return "FREETEXTTABLE";
+            case FtsSearchMode.WeightedPrefixes:
+               return "CONTAINSTABLE";
+            default:
+               throw new InvalidOperationException( "SearchMode is not set correctly." );
+         }
+      }
+
       private string CreateBaseQuery()
       {
-         return $"SELECT {TableAlias}.* FROM {GetTableName()} AS {TableAlias} INNER JOIN FREETEXTTABLE({GetTableName()}, ({string.Join( ", ", GetTermColumnNames() )}), {{0}} ) AS {KeyTable} ON {TableAlias}.{GetKeyColumnName()} = {KeyTable}.[KEY]";
+         return $"SELECT * FROM {GetTableName()} AS {TableAlias} INNER JOIN {GetSearchTable()}({GetTableName()}, *, {{0}} ) AS {KeyTable} ON {TableAlias}.{GetKeyColumnName()} = {KeyTable}.[KEY]";
       }
 
       private string CreateOrderBy( int offset, int fetch )
@@ -63,12 +104,12 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
          {
             throw new QuerySearchException( "The IFilterForm must also implement IPageFrom in order to support FtsQuerySearchProvider." );
          }
-         
+
          // keep track of the untouched query
          var untouchedQuery = query;
 
          // we only need to perform this 'special' filtering in case there is a term
-         var term = filteringForm.GetTerm();
+         var term = GetSearchExpression( filteringForm.GetTerm() );
          if( !string.IsNullOrWhiteSpace( term ) )
          {
             // rewrite the 'base query' to include a full text filter (will be placed in a sub query)
@@ -77,10 +118,10 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
 
             // apply the default where clause onto the query (will be placed in an outer query)
             query = base.ApplyWhere( query, filteringForm );
-            
+
             // get the sql representing the query
             var sql = query.ToSql();
-            
+
             // create a reader for our sql, and a builder to build a new query
             var reader = new StringReader( sql );
             var builder = new StringBuilder();
@@ -126,7 +167,7 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
             throw new QuerySearchException( "The IPageForm must also implement IFilterForm in order to support FtsQuerySearchProvider." );
          }
 
-         var term = filteringForm.GetTerm();
+         var term = GetSearchExpression( filteringForm.GetTerm() );
          if( !string.IsNullOrWhiteSpace( term ) )
          {
             // keep track of the untouched query
