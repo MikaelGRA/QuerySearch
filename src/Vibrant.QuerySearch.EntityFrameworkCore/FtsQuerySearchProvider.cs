@@ -89,7 +89,7 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
 
       private string CreateBaseQuery()
       {
-         return $"SELECT * FROM {GetTableName()} AS {TableAlias} INNER JOIN {GetSearchTable()}({GetTableName()}, *, {{0}} ) AS {KeyTable} ON {TableAlias}.{GetKeyColumnName()} = {KeyTable}.[KEY]";
+         return $"SELECT {TableAlias}.* FROM {GetTableName()} AS {TableAlias} INNER JOIN {GetSearchTable()}({GetTableName()}, *, {{0}} ) AS {KeyTable} ON {TableAlias}.{GetKeyColumnName()} = {KeyTable}.[KEY]";
       }
 
       private string CreateOrderBy( int offset, int fetch )
