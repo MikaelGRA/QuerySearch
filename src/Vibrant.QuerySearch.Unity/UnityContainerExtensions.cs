@@ -39,62 +39,6 @@ namespace Vibrant.QuerySearch.Unity
       }
 
       /// <summary>
-      /// Registers a filter provider.
-      /// </summary>
-      /// <typeparam name="TEntity"></typeparam>
-      /// <typeparam name="TFilterProvider"></typeparam>
-      /// <param name="registry"></param>
-      /// <param name="lifetimeManager"></param>
-      public static void RegisterFilterProvider<TEntity, TFilterProvider>(
-         this IUnityContainer registry,
-         LifetimeManager lifetimeManager )
-         where TFilterProvider : IFilterProvider<TEntity>
-      {
-         registry.RegisterType<IFilterProvider<TEntity>, TFilterProvider>( lifetimeManager );
-      }
-
-      /// <summary>
-      /// Registers a filter provider.
-      /// </summary>
-      /// <typeparam name="TEntity"></typeparam>
-      /// <typeparam name="TFilterProvider"></typeparam>
-      /// <param name="registry"></param>
-      public static void RegisterFilterProvider<TEntity, TFilterProvider>(
-         this IUnityContainer registry )
-         where TFilterProvider : IFilterProvider<TEntity>
-      {
-         registry.RegisterType<IFilterProvider<TEntity>, TFilterProvider>();
-      }
-
-      /// <summary>
-      /// Registers a pagination provider.
-      /// </summary>
-      /// <typeparam name="TEntity"></typeparam>
-      /// <typeparam name="TPaginationProvider"></typeparam>
-      /// <param name="registry"></param>
-      /// <param name="lifetimeManager"></param>
-      public static void RegisterPaginationProvider<TEntity, TPaginationProvider>(
-         this IUnityContainer registry,
-         LifetimeManager lifetimeManager )
-         where TPaginationProvider : IPaginationProvider<TEntity>
-      {
-         registry.RegisterType<IPaginationProvider<TEntity>, TPaginationProvider>( lifetimeManager );
-      }
-
-      /// <summary>
-      /// Registers a pagination provider.
-      /// </summary>
-      /// <typeparam name="TEntity"></typeparam>
-      /// <typeparam name="TPaginationProvider"></typeparam>
-      /// <param name="registry"></param>
-      public static void RegisterPaginationProvider<TEntity, TPaginationProvider>(
-         this IUnityContainer registry )
-         where TPaginationProvider : IPaginationProvider<TEntity>
-      {
-         registry.RegisterType<IPaginationProvider<TEntity>, TPaginationProvider>();
-      }
-
-      /// <summary>
       /// Registers a query search provider.
       /// </summary>
       /// <typeparam name="TEntity"></typeparam>

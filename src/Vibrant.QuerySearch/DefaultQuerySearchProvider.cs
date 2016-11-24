@@ -16,6 +16,9 @@ namespace Vibrant.QuerySearch
    /// <typeparam name="TEntity"></typeparam>
    public class DefaultQuerySearchProvider<TEntity> : IQuerySearchProvider<TEntity>
    {
+      private static readonly MethodInfo StartsWith = typeof( string ).GetMethod( "StartsWith", new[] { typeof( string ) } );
+      private static readonly MethodInfo Contains = typeof( string ).GetMethod( "Contains", new[] { typeof( string ) } );
+
       private dynamic _defaultSort;
       private SortDirection _defaultSortDirection;
       private dynamic _uniqueSort;
@@ -43,6 +46,8 @@ namespace Vibrant.QuerySearch
 
          PageSize = 20;
          MaxTake = 20;
+         MinPageSize = 1;
+         MaxPageSize = 20;
          PredefinedPageSizes = new HashSet<int>();
          _parameter = Expression.Parameter( typeof( TEntity ), "x" );
       }
@@ -66,6 +71,16 @@ namespace Vibrant.QuerySearch
       /// Gets or sets the MaxTake.
       /// </summary>
       public int MaxTake { get; set; }
+
+      /// <summary>
+      /// Gets or sets the minimum page size.
+      /// </summary>
+      public int MinPageSize { get; set; }
+
+      /// <summary>
+      /// Gets or sets the maximum page size.
+      /// </summary>
+      public int MaxPageSize { get; set; }
 
       private IOrderedQueryable<TEntity> ApplyOrdering(
          IQueryable<TEntity> query,
@@ -205,7 +220,7 @@ namespace Vibrant.QuerySearch
                var pageSize = form.GetPageSize();
                if( !pageSize.HasValue )
                {
-                  throw new QuerySearchException( "No page sizes has been specified in the query." );
+                  throw new QuerySearchException( "No page size has been specified in the query." );
                }
                if( !PredefinedPageSizes.Contains( pageSize.Value ) )
                {
@@ -214,6 +229,17 @@ namespace Vibrant.QuerySearch
                return pageSize.Value;
             case PaginationMode.AnyPageSize:
                return form.GetPageSize() ?? PageSize;
+            case PaginationMode.MinMaxPageSize:
+               var ps = form.GetPageSize();
+               if( !ps.HasValue )
+               {
+                  throw new QuerySearchException( "No page size has been specified in the query." );
+               }
+               if( ps < MinPageSize || ps > MaxPageSize )
+               {
+                  throw new QuerySearchException( "Invalid page size was specified." );
+               }
+               return ps.Value;
             default:
                throw new QuerySearchException( $"Invalid PaginationMode configured: {Mode}." );
          }
@@ -369,6 +395,12 @@ namespace Vibrant.QuerySearch
                      break;
                   case ComparisonType.LessThanOrEqual:
                      left = Expression.LessThanOrEqual( memberAccessor, parameterizedPropertyValue );
+                     break;
+                  case ComparisonType.StartsWith:
+                     left = Expression.Call( memberAccessor, StartsWith, parameterizedPropertyValue );
+                     break;
+                  case ComparisonType.Contains:
+                     left = Expression.Call( memberAccessor, Contains, parameterizedPropertyValue );
                      break;
                   default:
                      throw new InvalidOperationException( $"Invalid comparison type '{comparisonType}'." );

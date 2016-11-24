@@ -15,7 +15,8 @@ namespace Vibrant.QuerySearch
    {
       private static readonly HashSet<string> Descending = new HashSet<string>( StringComparer.OrdinalIgnoreCase ) { "desc", "descending" };
       private static readonly HashSet<string> Ascending = new HashSet<string>( StringComparer.OrdinalIgnoreCase ) { "asc", "ascending" };
-      
+      private static readonly BindingFlags FindPropertyFlags = BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+
       /// <summary>
       /// Calculates an expression that accesses the member at the specified property path of the parameter.
       /// </summary>
@@ -30,7 +31,7 @@ namespace Vibrant.QuerySearch
 
          foreach( var propertyName in propertyPath.Split( '.' ) )
          {
-            propertyInfo = currentType.GetProperty( propertyName );
+            propertyInfo = currentType.GetProperty( propertyName, FindPropertyFlags );
             if( propertyInfo == null )
             {
                throw new QuerySearchException( $"Could not find the property '{propertyName}' on the type '{currentType.FullName}'." );

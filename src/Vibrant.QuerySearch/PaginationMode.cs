@@ -11,5 +11,6 @@ namespace Vibrant.QuerySearch
       PredefinedPageSizes,
       AnyPageSize,
       SkipAndTake,
+      MinMaxPageSize,
    }
 }

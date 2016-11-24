@@ -78,5 +78,71 @@ namespace Vibrant.QuerySearch
             Items = items
          };
       }
+      /// <summary>
+      /// Searches the specfied queryable for entities using the provided search form.
+      /// </summary>
+      /// <typeparam name="TEntity">The type of entities to look for.</typeparam>
+      /// <typeparam name="TQuerySearchProvider">The IQuerySearchProvider to use.</typeparam>
+      /// <param name="query">The queryable that should be searched.</param>
+      /// <param name="search">The search form that should be used to search the query.</param>
+      /// <returns>A QuerySearchResult that contains the result of the search.</returns>
+      public static QuerySearchResult<TEntity> Search<TEntity, TQuerySearchProvider>( this IQueryable<TEntity> query, ISearchForm search )
+         where TQuerySearchProvider : IQuerySearchProvider<TEntity>
+      {
+         return query.Search<TEntity, TQuerySearchProvider>( search, null );
+      }
+
+      /// <summary>
+      /// Searches the specfied queryable for entities using the provided search form.
+      /// </summary>
+      /// <typeparam name="TEntity">The type of entities to look for.</typeparam>
+      /// <typeparam name="TQuerySearchProvider">The IQuerySearchProvider to use.</typeparam>
+      /// <param name="query">The queryable that should be searched.</param>
+      /// <param name="search">The search form that should be used to search the query.</param>
+      /// <param name="postCountProcessesing">Function to be called after processing the count portions of the query. Often used to add navigation inclusions.</param>
+      /// <returns>A QuerySearchResult that contains the result of the search.</returns>
+      public static QuerySearchResult<TEntity> Search<TEntity, TQuerySearchProvider>( this IQueryable<TEntity> query, ISearchForm search, Func<IQueryable<TEntity>, IQueryable<TEntity>> postCountProcessesing )
+         where TQuerySearchProvider : IQuerySearchProvider<TEntity>
+      {
+         if( query == null )
+            throw new ArgumentNullException( nameof( query ) );
+         if( search == null )
+            throw new ArgumentNullException( nameof( query ) );
+
+         var registry = DependencyResolver.Current;
+         if( registry == null )
+            throw new QuerySearchException( "No dependency resolver has been specified." );
+
+         var provider = registry.Resolve<TQuerySearchProvider>();
+         if( provider == null )
+            throw new QuerySearchException( $"No IQuerySearchProvider has been registered of the type '{typeof( TQuerySearchProvider ).FullName}'." );
+
+         var fullCount = query.Count();
+
+         query = provider.ApplyWhere( query, search );
+
+         var filteredCount = query.Count();
+
+         if( postCountProcessesing != null )
+         {
+            query = postCountProcessesing( query );
+         }
+
+         var result = provider.ApplyPagination( query, search );
+
+         var items = result.Query.ToList();
+
+         return new QuerySearchResult<TEntity>
+         {
+            FullCount = fullCount,
+            FilteredCount = filteredCount,
+            FullPageCount = PaginationHelper.GetPageCount( fullCount, result.PageSize ),
+            FilteredPageCount = PaginationHelper.GetPageCount( filteredCount, result.PageSize ),
+            Page = result.Page,
+            Skip = result.Skip,
+            Take = result.Take,
+            Items = items
+         };
+      }
    }
 }

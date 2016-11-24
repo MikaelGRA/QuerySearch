@@ -49,6 +49,16 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
       /// </summary>
       protected abstract string GetUniqueColumnSort();
 
+      /// <summary>
+      /// Gets the columns to perform the search on given the specified term.
+      /// </summary>
+      /// <param name="term"></param>
+      /// <returns></returns>
+      protected virtual string[] GetSearchColumns( string term )
+      {
+         return new[] { "*" };
+      }
+
       private string GetSearchExpression( string term )
       {
          if( SearchMode == FtsSearchMode.FreeText )
@@ -63,7 +73,7 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
             }
 
             var words = term.Split( SplitChars, StringSplitOptions.RemoveEmptyEntries );
-            if(words.Length == 0 )
+            if( words.Length == 0 )
             {
                return null;
             }
@@ -87,9 +97,9 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
          }
       }
 
-      private string CreateBaseQuery()
+      private string CreateBaseQuery( string term )
       {
-         return $"SELECT * FROM {GetTableName()} AS {TableAlias} INNER JOIN {GetSearchTable()}({GetTableName()}, *, {{0}} ) AS {KeyTable} ON {TableAlias}.{GetKeyColumnName()} = {KeyTable}.[KEY]";
+         return $"SELECT * FROM {GetTableName()} AS {TableAlias} INNER JOIN {GetSearchTable()}({GetTableName()}, ({string.Join( ", ", GetSearchColumns( term ) )}), {{0}} ) AS {KeyTable} ON {TableAlias}.{GetKeyColumnName()} = {KeyTable}.[KEY]";
       }
 
       private string CreateOrderBy( int offset, int fetch )
@@ -109,11 +119,12 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
          var untouchedQuery = query;
 
          // we only need to perform this 'special' filtering in case there is a term
-         var term = GetSearchExpression( filteringForm.GetTerm() );
+         var rawTerm = filteringForm.GetTerm();
+         var term = GetSearchExpression( rawTerm );
          if( !string.IsNullOrWhiteSpace( term ) )
          {
             // rewrite the 'base query' to include a full text filter (will be placed in a sub query)
-            string baseQuery = CreateBaseQuery();
+            string baseQuery = CreateBaseQuery( rawTerm );
             query = query.FromSql( baseQuery, term );
 
             // apply the default where clause onto the query (will be placed in an outer query)

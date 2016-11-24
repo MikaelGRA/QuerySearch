@@ -35,5 +35,15 @@ namespace Vibrant.QuerySearch
       /// A less than or equals comparison (>=)
       /// </summary>
       LessThanOrEqual = 5,
+
+      /// <summary>
+      /// A starts with comparison.
+      /// </summary>
+      StartsWith = 6,
+
+      /// <summary>
+      /// A contains comparison.
+      /// </summary>
+      Contains = 7,
    }
 }

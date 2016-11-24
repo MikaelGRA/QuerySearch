@@ -15,12 +15,36 @@ namespace Vibrant.QuerySearch.ConsoleApp
          var services = new ServiceCollection();
 
          services.AddSingleton<ILocalizationService, DefaultLocalizationService>();
+         services.AddSingleton<IQuerySearchProvider<Item>, ItemQuerySearchProvider>();
+         services.AddSingleton<ItemQuerySearchProvider>();
 
          var provider = services.BuildServiceProvider();
 
          DependencyResolver.Current = new DependencyResolverImpl( provider );
 
-         Console.WriteLine( "Whatever" );
+         var items = new List<Item>
+         {
+            new Item { Lol = "Hehehe" },
+         };
+
+         var form = new SearchForm
+         {
+            OrderBy = "lol desc",
+            PageSize = 10,
+            Parameters = new List<PropertyComparison>
+            {
+               new PropertyComparison
+               {
+                  Path = "lol",
+                  Type = ComparisonType.Contains,
+                  Value = "ehe"
+               }
+            }
+         };
+
+         var result = items.AsQueryable().Search<Item, ItemQuerySearchProvider>( form );
+
+         Console.ReadKey();
       }
    }
 
@@ -37,5 +61,19 @@ namespace Vibrant.QuerySearch.ConsoleApp
       {
          return _serviceProvider.GetRequiredService<TService>();
       }
+   }
+
+   public class ItemQuerySearchProvider : DefaultQuerySearchProvider<Item>
+   {
+      public ItemQuerySearchProvider( ILocalizationService localization ) : base( localization )
+      {
+         RegisterDefaultSort( x => x.Lol, SortDirection.Ascending, true );
+         Mode = PaginationMode.MinMaxPageSize;
+      }
+   }
+
+   public class Item
+   {
+      public string Lol { get; set; }
    }
 }
