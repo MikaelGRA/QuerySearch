@@ -43,13 +43,14 @@ namespace Vibrant.QuerySearch
          _predefinedPredicates = new Dictionary<string, Expression<Func<TEntity, bool>>>( StringComparer.OrdinalIgnoreCase );
          _localizationToPredicate = new Dictionary<CultureInfo, Dictionary<string, Expression<Func<TEntity, bool>>>>();
          _localizationKeyToPredicate = new Dictionary<string, Expression<Func<TEntity, bool>>>();
+         _parameter = Expression.Parameter( typeof( TEntity ), "x" );
 
+         WordCombiner = WordSearchCombiner.And;
          PageSize = 20;
          MaxTake = 20;
          MinPageSize = 1;
          MaxPageSize = 20;
          PredefinedPageSizes = new HashSet<int>();
-         _parameter = Expression.Parameter( typeof( TEntity ), "x" );
       }
 
       /// <summary>
@@ -81,6 +82,11 @@ namespace Vibrant.QuerySearch
       /// Gets or sets the maximum page size.
       /// </summary>
       public int MaxPageSize { get; set; }
+
+      /// <summary>
+      /// Gets or sets whether And/Or should be used to combine word for text searches.
+      /// </summary>
+      public WordSearchCombiner WordCombiner { get; set; }
 
       private IOrderedQueryable<TEntity> ApplyOrdering(
          IQueryable<TEntity> query,
@@ -298,7 +304,7 @@ namespace Vibrant.QuerySearch
          {
             foreach( var word in words )
             {
-               predicate1 = AddExpression( predicate1, _getFreeWordPredicate( word ), ExpressionType.OrElse );
+               predicate1 = AddExpression( predicate1, _getFreeWordPredicate( word ), WordCombiner == WordSearchCombiner.And ? ExpressionType.AndAlso : ExpressionType.OrElse );
             }
          }
 
