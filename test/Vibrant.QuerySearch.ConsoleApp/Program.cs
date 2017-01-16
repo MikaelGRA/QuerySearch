@@ -29,7 +29,7 @@ namespace Vibrant.QuerySearch.ConsoleApp
 
          var form = new SearchForm
          {
-            OrderBy = "lol desc",
+            OrderBy = "lol desc, lol desc",
             PageSize = 10,
             Parameters = new List<PropertyComparison>
             {
@@ -67,7 +67,8 @@ namespace Vibrant.QuerySearch.ConsoleApp
    {
       public ItemQuerySearchProvider( ILocalizationService localization ) : base( localization )
       {
-         RegisterDefaultSort( x => x.Lol, SortDirection.Ascending, true );
+         RegisterDefaultSort( q => q.OrderBy( x => x.Lol ), true );
+         RegisterUniqueSort( q => q.ThenBy( x => x.Lol ) );
          Mode = PaginationMode.MinMaxPageSize;
       }
    }
