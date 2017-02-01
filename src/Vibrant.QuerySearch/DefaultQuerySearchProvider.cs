@@ -308,6 +308,8 @@ namespace Vibrant.QuerySearch
             currentBody = keywordPredicate;
          }
 
+         Expression<Func<TEntity, bool>> parameterPredicate = null;
+         var composition = filteringForm.GetFilterComposition();
          var parameters = filteringForm.GetAdditionalFilters();
          if( parameters != null )
          {
@@ -352,9 +354,23 @@ namespace Vibrant.QuerySearch
                      throw new InvalidOperationException( $"Invalid comparison type '{comparisonType}'." );
                }
 
-               currentBody = AddExpression( currentBody, Expression.Lambda<Func<TEntity, bool>>( left, _parameter ), ExpressionType.AndAlso );
+               parameterPredicate = AddExpression(
+                  parameterPredicate, 
+                  Expression.Lambda<Func<TEntity, bool>>( left, _parameter ), 
+                  composition == FilterComposition.And ? ExpressionType.AndAlso : ExpressionType.OrElse );
             }
          }
+
+         // combine with current body as needed
+         if( currentBody != null && parameterPredicate != null )
+         {
+            currentBody = currentBody.And( parameterPredicate );
+         }
+         else if( parameterPredicate != null )
+         {
+            currentBody = parameterPredicate;
+         }
+
 
          if( currentBody != null )
          {

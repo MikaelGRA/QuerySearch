@@ -18,6 +18,12 @@ namespace Vibrant.QuerySearch
       string GetTerm();
 
       /// <summary>
+      /// Gets or sets the way to combine the additional filters.
+      /// </summary>
+      /// <returns>A way to compose additional filters.</returns>
+      FilterComposition GetFilterComposition();
+
+      /// <summary>
       /// Gets any additional filters to be used for filtering.
       /// </summary>
       /// <returns>An enumerable of property comparisons.</returns>

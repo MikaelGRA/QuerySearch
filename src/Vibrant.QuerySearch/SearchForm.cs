@@ -48,6 +48,11 @@ namespace Vibrant.QuerySearch
       public string Term { get; set; }
 
       /// <summary>
+      /// Gets or sets the way to composite paramters.
+      /// </summary>
+      public FilterComposition ParameterComposition { get; set; }
+
+      /// <summary>
       /// Gets or sets any additional search parameters.
       /// </summary>
       public List<PropertyComparison> Parameters { get; set; }
@@ -125,6 +130,15 @@ namespace Vibrant.QuerySearch
       public bool SortByTermRank()
       {
          return OrderByTerm;
+      }
+
+      /// <summary>
+      /// Gets or sets the way to combine the additional filters.
+      /// </summary>
+      /// <returns>A way to compose additional filters.</returns>
+      public FilterComposition GetFilterComposition()
+      {
+         return ParameterComposition;
       }
    }
 }
