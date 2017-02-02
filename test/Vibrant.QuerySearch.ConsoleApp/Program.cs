@@ -21,24 +21,32 @@ namespace Vibrant.QuerySearch.ConsoleApp
          var provider = services.BuildServiceProvider();
 
          DependencyResolver.Current = new DependencyResolverImpl( provider );
+         var id = Guid.NewGuid();
 
          var items = new List<Item>
          {
-            new Item { Lol = "Hehehe" },
+            new Item { Lol = "Hehehe", Id = id },
          };
 
          var form = new SearchForm
          {
             OrderBy = "lol desc, lol desc",
             PageSize = 10,
+            ParameterComposition = FilterComposition.Or,
             Parameters = new List<PropertyComparison>
             {
                new PropertyComparison
                {
                   Path = "lol",
                   Type = ComparisonType.Contains,
-                  Value = "ehe"
-               }
+                  Value = "aehe"
+               },
+               new PropertyComparison
+               {
+                  Path = "Id",
+                  Type = ComparisonType.Equal,
+                  Value = Guid.NewGuid()
+               },
             }
          };
 
@@ -76,5 +84,7 @@ namespace Vibrant.QuerySearch.ConsoleApp
    public class Item
    {
       public string Lol { get; set; }
+
+      public Guid Id { get; set; }
    }
 }

@@ -323,8 +323,17 @@ namespace Vibrant.QuerySearch
                   ? propertyType.GetGenericArguments()[ 0 ]
                   : propertyType;
                var propertyValue = propertyComparison.GetValue();
-               var convertedPropertyValue = Convert.ChangeType( propertyValue, unwrappedPropertyType );
-               var parameterizedPropertyValue = ExpressionHelper.WrappedConstant( propertyType, convertedPropertyValue );
+
+               object convertedPropertyValue;
+               if( propertyValue is string && memberAccessor.Type == typeof( Guid ) )
+               {
+                  convertedPropertyValue = Guid.Parse( (string)propertyValue );
+               }
+               else
+               {
+                  convertedPropertyValue = Convert.ChangeType( propertyValue, memberAccessor.Type );
+               }
+               var parameterizedPropertyValue = ExpressionHelper.WrappedConstant( memberAccessor.Type, convertedPropertyValue );
 
                Expression left = null;
                switch( comparisonType )
@@ -355,8 +364,8 @@ namespace Vibrant.QuerySearch
                }
 
                parameterPredicate = AddExpression(
-                  parameterPredicate, 
-                  Expression.Lambda<Func<TEntity, bool>>( left, _parameter ), 
+                  parameterPredicate,
+                  Expression.Lambda<Func<TEntity, bool>>( left, _parameter ),
                   composition == FilterComposition.And ? ExpressionType.AndAlso : ExpressionType.OrElse );
             }
          }
