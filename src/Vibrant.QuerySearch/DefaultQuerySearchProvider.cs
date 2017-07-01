@@ -20,7 +20,8 @@ namespace Vibrant.QuerySearch
       private static readonly MethodInfo Contains = typeof( string ).GetMethod( "Contains", new[] { typeof( string ) } );
 
       private Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> _applyDefaultSort;
-      private Func<IOrderedQueryable<TEntity>, IOrderedQueryable<TEntity>> _applyUniqueSort;
+      //private Func<IOrderedQueryable<TEntity>, IOrderedQueryable<TEntity>> _applyUniqueSort;
+      private List<QueryOrderByInfo> _uniqueSortInfo;
       private bool _isDefaultSortAlsoUnique;
       private ParameterExpression _parameter;
 
@@ -43,6 +44,7 @@ namespace Vibrant.QuerySearch
          _localizationToPredicate = new Dictionary<CultureInfo, Dictionary<string, Expression<Func<TEntity, bool>>>>();
          _localizationKeyToPredicate = new Dictionary<string, Expression<Func<TEntity, bool>>>();
          _parameter = Expression.Parameter( typeof( TEntity ), "x" );
+         _uniqueSortInfo = new List<QueryOrderByInfo>();
 
          WordCombiner = WordSearchCombiner.And;
          PageSize = 20;
@@ -101,7 +103,7 @@ namespace Vibrant.QuerySearch
             // first order by user specified sorting
             query = query.OrderBy( _parameter, sorting );
 
-            query = _applyUniqueSort( (IOrderedQueryable<TEntity>)query );
+            query = ApplyUniqueSort( (IOrderedQueryable<TEntity>)query );
          }
          else
          {
@@ -112,11 +114,41 @@ namespace Vibrant.QuerySearch
             else
             {
                query = _applyDefaultSort( query );
-               query = _applyUniqueSort( (IOrderedQueryable<TEntity>)query );
+               query = ApplyUniqueSort( (IOrderedQueryable<TEntity>)query );
             }
          }
 
          return CreatePaginationResult( query, form, true );
+      }
+
+      private IOrderedQueryable<TEntity> ApplyUniqueSort( List<SortMemberAccess> alreadySortedBy, IOrderedQueryable<TEntity> query )
+      {
+         if( _uniqueSortInfo.Count > 0 )
+         {
+            ParameterExpression queryParameter = Expression.Parameter( typeof( IOrderedQueryable<TEntity> ), "query" );
+            Expression currentExpression = queryParameter;
+            foreach( var info in _uniqueSortInfo )
+            {
+               if( alreadySortedBy != null )
+               {
+                  // to break or not to break?
+
+               }
+
+               // filter out columns we have already filtered on....
+
+               // make a method call on current expression
+               var parameter = Expression.Parameter( typeof( TEntity ), "x" );
+               var accessor = Expression.Lambda( Expression.PropertyOrField( parameter, info.Member.Name ), parameter );
+               currentExpression = Expression.Call( info.Method, currentExpression, Expression.Quote( accessor ) );
+            }
+
+            var lambda = Expression.Lambda<Func<IOrderedQueryable<TEntity>, IOrderedQueryable<TEntity>>>( currentExpression, queryParameter );
+            var func = lambda.Compile();
+
+            query = func( query );
+         }
+         return query;
       }
 
       protected PaginationResult<TEntity> CreatePaginationResult( IQueryable<TEntity> query, IPageForm form, bool applyPagination )
@@ -216,9 +248,11 @@ namespace Vibrant.QuerySearch
       /// Registers a unique sorting behaviour.
       /// </summary>
       /// <param name="applyUniqueSort">A callback to apply a ThenBy expression to an ordered queryable.</param>
-      public void RegisterUniqueSort( Func<IOrderedQueryable<TEntity>, IOrderedQueryable<TEntity>> applyUniqueSort )
+      public void RegisterUniqueSort( Expression<Func<IOrderedQueryable<TEntity>, IOrderedQueryable<TEntity>>> applyUniqueSort )
       {
-         _applyUniqueSort = applyUniqueSort;
+         _uniqueSortInfo = new List<QueryOrderByInfo>();
+
+         ConstructQueryOrderByInfo( applyUniqueSort );
       }
 
       /// <summary>
@@ -491,6 +525,67 @@ namespace Vibrant.QuerySearch
             return new string[ 0 ];
          }
          return term.Split( new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries );
+      }
+
+      private void ConstructQueryOrderByInfo( Expression<Func<IOrderedQueryable<TEntity>, IOrderedQueryable<TEntity>>> expression )
+      {
+         var methodCallExpression = expression.Body as MethodCallExpression;
+         if( methodCallExpression != null )
+         {
+            ConstructQueryOrderByInfo( methodCallExpression );
+         }
+      }
+
+      private void ConstructQueryOrderByInfo( MethodCallExpression methodCallExpression )
+      {
+         var method = methodCallExpression.Method; // expected to be ThenBy or OrderBy on Queryable
+         if( method.Name == "ThenBy" || method.Name == "ThenByDescending" )
+         {
+            var previousMethodCallExpression = methodCallExpression.Arguments[ 0 ] as MethodCallExpression;
+            if( previousMethodCallExpression != null )
+            {
+               ConstructQueryOrderByInfo( previousMethodCallExpression );
+            }
+
+            var expectedLambdaExpression = methodCallExpression.Arguments[ 1 ];
+            var unquotedLambdaExpression = Unquote( expectedLambdaExpression );
+            var lambdaExpression = unquotedLambdaExpression as LambdaExpression;
+            if( lambdaExpression != null )
+            {
+               var memberExpression = lambdaExpression.Body as MemberExpression;
+               if( memberExpression != null )
+               {
+                  var member = memberExpression.Member;
+                  _uniqueSortInfo.Add( new QueryOrderByInfo( method, member ) );
+               }
+            }
+         }
+         else
+         {
+            throw new InvalidOperationException( "You are only allowed to call ThenBy and ThenByDescending when registering a unique sort." );
+         }
+      }
+
+      private static Expression Unquote( Expression expression )
+      {
+         if( expression.NodeType == ExpressionType.Quote )
+         {
+            return ( (UnaryExpression)expression ).Operand;
+         }
+         return expression;
+      }
+
+      private class QueryOrderByInfo
+      {
+         public QueryOrderByInfo( MethodInfo method, MemberInfo member )
+         {
+            Method = method;
+            Member = member;
+         }
+
+         public MethodInfo Method { get; set; }
+
+         public MemberInfo Member { get; set; }
       }
    }
 }
