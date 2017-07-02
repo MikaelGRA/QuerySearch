@@ -322,8 +322,9 @@ namespace Vibrant.QuerySearch
                   : propertyType;
                var propertyValue = propertyComparison.GetValue();
 
+
                object convertedPropertyValue;
-               if( propertyValue is string && memberAccessor.Type == typeof( Guid ) )
+               if( propertyValue is string && ( memberAccessor.Type == typeof( Guid ) || memberAccessor.Type == typeof( Guid? ) ) )
                {
                   convertedPropertyValue = Guid.Parse( (string)propertyValue );
                }
