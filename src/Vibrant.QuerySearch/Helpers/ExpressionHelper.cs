@@ -40,7 +40,7 @@ namespace Vibrant.QuerySearch
             currentExpression = Expression.Property( currentExpression ?? parameter, propertyInfo );
          }
 
-         return new MemberAccess( propertyInfo.PropertyType, currentExpression );
+         return new MemberAccess( propertyInfo.PropertyType, currentExpression, propertyPath );
       }
 
       /// <summary>

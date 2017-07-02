@@ -19,10 +19,11 @@ namespace Vibrant.QuerySearch
       private static readonly MethodInfo StartsWith = typeof( string ).GetMethod( "StartsWith", new[] { typeof( string ) } );
       private static readonly MethodInfo Contains = typeof( string ).GetMethod( "Contains", new[] { typeof( string ) } );
 
-      private Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> _applyDefaultSort;
-      //private Func<IOrderedQueryable<TEntity>, IOrderedQueryable<TEntity>> _applyUniqueSort;
+      private static readonly HashSet<string> AllowedUniqueSortMethods = new HashSet<string> { "ThenBy", "ThenByDescending" };
+      private static readonly HashSet<string> AllowedDefaultSortMethods = new HashSet<string> { "OrderBy", "OrderByDescending", "ThenBy", "ThenByDescending" };
+
+      private List<QueryOrderByInfo> _defaultSortInfo;
       private List<QueryOrderByInfo> _uniqueSortInfo;
-      private bool _isDefaultSortAlsoUnique;
       private ParameterExpression _parameter;
 
       private Dictionary<string, Expression<Func<TEntity, bool>>> _predefinedPredicates;
@@ -45,6 +46,7 @@ namespace Vibrant.QuerySearch
          _localizationKeyToPredicate = new Dictionary<string, Expression<Func<TEntity, bool>>>();
          _parameter = Expression.Parameter( typeof( TEntity ), "x" );
          _uniqueSortInfo = new List<QueryOrderByInfo>();
+         _defaultSortInfo = new List<QueryOrderByInfo>();
 
          WordCombiner = WordSearchCombiner.And;
          PageSize = 20;
@@ -98,57 +100,23 @@ namespace Vibrant.QuerySearch
       public virtual PaginationResult<TEntity> ApplyPagination( IQueryable<TEntity> query, IPageForm form )
       {
          var sorting = form.GetSorting( _parameter )?.ToList();
+         var alreadySortedByPropertyPaths = new List<string>();
+
          if( sorting != null && sorting.Count > 0 )
          {
             // first order by user specified sorting
             query = query.OrderBy( _parameter, sorting );
+            alreadySortedByPropertyPaths.AddRange( sorting.Select( x => x.PropertyPath ) );
 
-            query = ApplyUniqueSort( (IOrderedQueryable<TEntity>)query );
+            query = ApplyUniqueSort( alreadySortedByPropertyPaths, (IOrderedQueryable<TEntity>)query );
          }
          else
          {
-            if( _isDefaultSortAlsoUnique )
-            {
-               query = _applyDefaultSort( query );
-            }
-            else
-            {
-               query = _applyDefaultSort( query );
-               query = ApplyUniqueSort( (IOrderedQueryable<TEntity>)query );
-            }
+            query = ApplyDefaultSort( alreadySortedByPropertyPaths, query );
+            query = ApplyUniqueSort( alreadySortedByPropertyPaths, (IOrderedQueryable<TEntity>)query );
          }
 
          return CreatePaginationResult( query, form, true );
-      }
-
-      private IOrderedQueryable<TEntity> ApplyUniqueSort( List<SortMemberAccess> alreadySortedBy, IOrderedQueryable<TEntity> query )
-      {
-         if( _uniqueSortInfo.Count > 0 )
-         {
-            ParameterExpression queryParameter = Expression.Parameter( typeof( IOrderedQueryable<TEntity> ), "query" );
-            Expression currentExpression = queryParameter;
-            foreach( var info in _uniqueSortInfo )
-            {
-               if( alreadySortedBy != null )
-               {
-                  // to break or not to break?
-
-               }
-
-               // filter out columns we have already filtered on....
-
-               // make a method call on current expression
-               var parameter = Expression.Parameter( typeof( TEntity ), "x" );
-               var accessor = Expression.Lambda( Expression.PropertyOrField( parameter, info.Member.Name ), parameter );
-               currentExpression = Expression.Call( info.Method, currentExpression, Expression.Quote( accessor ) );
-            }
-
-            var lambda = Expression.Lambda<Func<IOrderedQueryable<TEntity>, IOrderedQueryable<TEntity>>>( currentExpression, queryParameter );
-            var func = lambda.Compile();
-
-            query = func( query );
-         }
-         return query;
       }
 
       protected PaginationResult<TEntity> CreatePaginationResult( IQueryable<TEntity> query, IPageForm form, bool applyPagination )
@@ -237,11 +205,9 @@ namespace Vibrant.QuerySearch
       /// Registers the default sorting behaviour.
       /// </summary>
       /// <param name="applyDefaultSort">A callback to apply an OrderBy expression to a queryable.</param>
-      /// <param name="isAlsoUniqueSort">An indicating of whether or not the default sort is the same as unique sort.</param>
-      public void RegisterDefaultSort( Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> applyDefaultSort, bool isAlsoUniqueSort )
+      public void RegisterDefaultSort( Expression<Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>> applyDefaultSort )
       {
-         _applyDefaultSort = applyDefaultSort;
-         _isDefaultSortAlsoUnique = isAlsoUniqueSort;
+         ConstructQueryOrderByInfoForDefaultSort( applyDefaultSort );
       }
 
       /// <summary>
@@ -250,9 +216,7 @@ namespace Vibrant.QuerySearch
       /// <param name="applyUniqueSort">A callback to apply a ThenBy expression to an ordered queryable.</param>
       public void RegisterUniqueSort( Expression<Func<IOrderedQueryable<TEntity>, IOrderedQueryable<TEntity>>> applyUniqueSort )
       {
-         _uniqueSortInfo = new List<QueryOrderByInfo>();
-
-         ConstructQueryOrderByInfo( applyUniqueSort );
+         ConstructQueryOrderByInfoForUniqueSort( applyUniqueSort );
       }
 
       /// <summary>
@@ -527,24 +491,105 @@ namespace Vibrant.QuerySearch
          return term.Split( new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries );
       }
 
-      private void ConstructQueryOrderByInfo( Expression<Func<IOrderedQueryable<TEntity>, IOrderedQueryable<TEntity>>> expression )
+      private IQueryable<TEntity> ApplyDefaultSort( List<string> alreadySortedByPropertyPaths, IQueryable<TEntity> query )
       {
+         if( _defaultSortInfo.Count > 0 )
+         {
+            int appliedCount = 0;
+            ParameterExpression queryParameter = Expression.Parameter( typeof( IQueryable<TEntity> ), "query" );
+            Expression currentExpression = queryParameter;
+            foreach( var info in _defaultSortInfo )
+            {
+               if( alreadySortedByPropertyPaths != null && info.PropertyPath != null )
+               {
+                  // ignore this property path, if we already sorted by it
+                  if( alreadySortedByPropertyPaths.Any( propertyPath => StringComparer.OrdinalIgnoreCase.Equals( propertyPath, info.PropertyPath ) ) )
+                  {
+                     continue;
+                  }
+               }
+
+               // make a method call on current expression
+               currentExpression = Expression.Call( info.Method, currentExpression, info.LambdaExpression );
+               alreadySortedByPropertyPaths.Add( info.PropertyPath );
+               appliedCount++;
+            }
+
+            if( appliedCount > 0 )
+            {
+               var lambda = Expression.Lambda<Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>>( currentExpression, queryParameter );
+               var func = lambda.Compile();
+               query = func( query );
+            }
+         }
+         return query;
+      }
+
+      private IQueryable<TEntity> ApplyUniqueSort( List<string> alreadySortedByPropertyPaths, IOrderedQueryable<TEntity> query )
+      {
+         if( _uniqueSortInfo.Count > 0 )
+         {
+            int appliedCount = 0;
+            ParameterExpression queryParameter = Expression.Parameter( typeof( IOrderedQueryable<TEntity> ), "query" );
+            Expression currentExpression = queryParameter;
+            foreach( var info in _uniqueSortInfo )
+            {
+               if( alreadySortedByPropertyPaths != null && info.PropertyPath != null )
+               {
+                  // ignore this property path, if we already sorted by it
+                  if( alreadySortedByPropertyPaths.Any( propertyPath => StringComparer.OrdinalIgnoreCase.Equals( propertyPath, info.PropertyPath ) ) )
+                  {
+                     continue;
+                  }
+               }
+
+               // make a method call on current expression
+               currentExpression = Expression.Call( info.Method, currentExpression, info.LambdaExpression );
+               alreadySortedByPropertyPaths.Add( info.PropertyPath );
+               appliedCount++;
+            }
+
+            if( appliedCount > 0 )
+            {
+               var lambda = Expression.Lambda<Func<IOrderedQueryable<TEntity>, IOrderedQueryable<TEntity>>>( currentExpression, queryParameter );
+               var func = lambda.Compile();
+               query = func( query );
+            }
+         }
+         return query;
+      }
+
+      private void ConstructQueryOrderByInfoForDefaultSort( Expression<Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>> expression )
+      {
+         _defaultSortInfo = new List<QueryOrderByInfo>();
+
          var methodCallExpression = expression.Body as MethodCallExpression;
          if( methodCallExpression != null )
          {
-            ConstructQueryOrderByInfo( methodCallExpression );
+            ConstructQueryOrderByInfo( AllowedDefaultSortMethods, _defaultSortInfo, methodCallExpression );
          }
       }
 
-      private void ConstructQueryOrderByInfo( MethodCallExpression methodCallExpression )
+      private void ConstructQueryOrderByInfoForUniqueSort( Expression<Func<IOrderedQueryable<TEntity>, IOrderedQueryable<TEntity>>> expression )
+      {
+         _uniqueSortInfo = new List<QueryOrderByInfo>();
+
+         var methodCallExpression = expression.Body as MethodCallExpression;
+         if( methodCallExpression != null )
+         {
+            ConstructQueryOrderByInfo( AllowedUniqueSortMethods, _uniqueSortInfo, methodCallExpression );
+         }
+      }
+
+      private static void ConstructQueryOrderByInfo( ISet<string> allowedMethods, List<QueryOrderByInfo> orderByInfos, MethodCallExpression methodCallExpression )
       {
          var method = methodCallExpression.Method; // expected to be ThenBy or OrderBy on Queryable
-         if( method.Name == "ThenBy" || method.Name == "ThenByDescending" )
+         if( allowedMethods.Contains( method.Name ) )
          {
             var previousMethodCallExpression = methodCallExpression.Arguments[ 0 ] as MethodCallExpression;
             if( previousMethodCallExpression != null )
             {
-               ConstructQueryOrderByInfo( previousMethodCallExpression );
+               ConstructQueryOrderByInfo( allowedMethods, orderByInfos, previousMethodCallExpression );
             }
 
             var expectedLambdaExpression = methodCallExpression.Arguments[ 1 ];
@@ -552,17 +597,30 @@ namespace Vibrant.QuerySearch
             var lambdaExpression = unquotedLambdaExpression as LambdaExpression;
             if( lambdaExpression != null )
             {
+               string propertyPath = null;
                var memberExpression = lambdaExpression.Body as MemberExpression;
                if( memberExpression != null )
                {
+                  var members = new List<MemberInfo>();
                   var member = memberExpression.Member;
-                  _uniqueSortInfo.Add( new QueryOrderByInfo( method, member ) );
+                  members.Add( member );
+                  var parameterOrMemberExpression = memberExpression.Expression;
+                  while( parameterOrMemberExpression is MemberExpression )
+                  {
+                     var newMemberExpression = (MemberExpression)parameterOrMemberExpression;
+                     members.Insert( 0, newMemberExpression.Member );
+                     parameterOrMemberExpression = newMemberExpression.Expression;
+                  }
+
+                  propertyPath = string.Join( ".", members.Select( x => x.Name ) );
                }
+
+               orderByInfos.Add( new QueryOrderByInfo( method, expectedLambdaExpression, propertyPath ) );
             }
          }
          else
          {
-            throw new InvalidOperationException( "You are only allowed to call ThenBy and ThenByDescending when registering a unique sort." );
+            throw new InvalidOperationException( "You are only allowed to call the following methods when registering this callback: " + string.Join( ", ", allowedMethods ) );
          }
       }
 
@@ -577,15 +635,18 @@ namespace Vibrant.QuerySearch
 
       private class QueryOrderByInfo
       {
-         public QueryOrderByInfo( MethodInfo method, MemberInfo member )
+         public QueryOrderByInfo( MethodInfo method, Expression lambdaExpression, string propertyPath )
          {
             Method = method;
-            Member = member;
+            LambdaExpression = lambdaExpression;
+            PropertyPath = propertyPath;
          }
 
          public MethodInfo Method { get; set; }
 
-         public MemberInfo Member { get; set; }
+         public string PropertyPath { get; set; }
+
+         public Expression LambdaExpression { get; set; }
       }
    }
 }

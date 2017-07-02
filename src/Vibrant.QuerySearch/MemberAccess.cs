@@ -11,10 +11,11 @@ namespace Vibrant.QuerySearch
    /// </summary>
    public class MemberAccess
    {
-      public MemberAccess( Type memberType, Expression memberAccessor )
+      public MemberAccess( Type memberType, Expression memberAccessor, string propertyPath )
       {
          MemberType = memberType;
          MemberAccessor = memberAccessor;
+         PropertyPath = propertyPath;
       }
 
       /// <summary>
@@ -28,13 +29,18 @@ namespace Vibrant.QuerySearch
       public Expression MemberAccessor { get; private set; }
 
       /// <summary>
+      /// Gets the property path of the member accesses.
+      /// </summary>
+      public string PropertyPath { get; private set; }
+
+      /// <summary>
       /// Gets a SortMemberAccess that is sorted.
       /// </summary>
       /// <param name="sort"></param>
       /// <returns></returns>
       public SortMemberAccess WithSorting( SortDirection sort )
       {
-         return new SortMemberAccess( MemberType, sort, MemberAccessor );
+         return new SortMemberAccess( MemberType, sort, MemberAccessor, PropertyPath );
       }
    }
 }

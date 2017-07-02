@@ -26,28 +26,29 @@ namespace Vibrant.QuerySearch.ConsoleApp
          var items = new List<Item>
          {
             new Item { Lol = "Hehehe", Id = id },
+            new Item { Lol = "ABC", Id = Guid.NewGuid() },
          };
 
          var form = new SearchForm
          {
-            OrderBy = "lol desc, lol desc",
+            //OrderBy = "lol desc",
             PageSize = 10,
-            ParameterComposition = FilterComposition.Or,
-            Parameters = new List<PropertyComparison>
-            {
-               new PropertyComparison
-               {
-                  Path = "lol",
-                  Type = ComparisonType.Contains,
-                  Value = "aehe"
-               },
-               new PropertyComparison
-               {
-                  Path = "Id",
-                  Type = ComparisonType.Equal,
-                  Value = Guid.NewGuid()
-               },
-            }
+            //ParameterComposition = FilterComposition.Or,
+            //Parameters = new List<PropertyComparison>
+            //{
+            //   new PropertyComparison
+            //   {
+            //      Path = "lol",
+            //      Type = ComparisonType.Contains,
+            //      Value = "ehe"
+            //   },
+            //   new PropertyComparison
+            //   {
+            //      Path = "Id",
+            //      Type = ComparisonType.Equal,
+            //      Value = Guid.NewGuid()
+            //   },
+            //}
          };
 
          var result = items.AsQueryable().Search<Item, ItemQuerySearchProvider>( form );
@@ -75,7 +76,7 @@ namespace Vibrant.QuerySearch.ConsoleApp
    {
       public ItemQuerySearchProvider( ILocalizationService localization ) : base( localization )
       {
-         RegisterDefaultSort( q => q.OrderBy( x => x.Lol ), true );
+         RegisterDefaultSort( q => q.OrderBy( x => x.Lol ) );
          RegisterUniqueSort( q => q.ThenBy( x => x.Lol ) );
          Mode = PaginationMode.MinMaxPageSize;
       }

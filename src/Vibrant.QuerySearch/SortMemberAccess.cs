@@ -11,8 +11,8 @@ namespace Vibrant.QuerySearch
    /// </summary>
    public class SortMemberAccess : MemberAccess
    {
-      public SortMemberAccess( Type memberType, SortDirection sortDirection, Expression memberAccessor )
-         : base( memberType, memberAccessor )
+      public SortMemberAccess( Type memberType, SortDirection sortDirection, Expression memberAccessor, string propertyPath )
+         : base( memberType, memberAccessor, propertyPath )
       {
          SortDirection = sortDirection;
       }
