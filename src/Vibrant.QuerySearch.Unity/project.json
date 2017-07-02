@@ -1,5 +1,5 @@
 {
-   "version": "4.0.0-*",
+   "version": "6.0.0-*",
    "title": "Unity DependencyResolver for QuerySearch",
    "description": "Provides an implementation of IDependencyResolver implemented using Unity.",
    "authors": [ "MikaelGRA" ],
@@ -10,7 +10,7 @@
       "licenseUrl": "https://github.com/MikaelGRA/QuerySearch/blob/master/LICENSE",
       "releaseNotes": "https://github.com/MikaelGRA/QuerySearch/blob/master/CHANGELOG.md"
    },
-   "copyright": "Copyright (c) 2015-2016 MikaelGRA",
+   "copyright": "Copyright (c) 2015-2017 MikaelGRA",
    "frameworks": {
       "net45": {
          "dependencies": {
@@ -25,7 +25,7 @@
       }
    },
    "dependencies": {
-      "Vibrant.QuerySearch": "4.0.0-*"
+      "Vibrant.QuerySearch": "6.0.0-*"
    },
    "scripts": {
       "postcompile": [

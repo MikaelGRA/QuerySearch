@@ -1,5 +1,5 @@
 ﻿{
-   "version": "5.1.3-*",
+   "version": "6.0.0-*",
    "title": "QuerySearch for .NET",
    "description": "Provides IQueryable extensions for easily working with filtering and pagination.",
    "authors": [ "MikaelGRA" ],
@@ -10,7 +10,7 @@
       "releaseNotes": "https://github.com/MikaelGRA/QuerySearch/blob/master/CHANGELOG.md",
       "projectUrl": "https://github.com/MikaelGRA/QuerySearch"
    },
-   "copyright": "Copyright (c) 2015-2016 MikaelGRA",
+   "copyright": "Copyright (c) 2015-2017 MikaelGRA",
    "frameworks": {
       "net45": {},
       "netstandard1.3": {

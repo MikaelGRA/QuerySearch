@@ -15,8 +15,8 @@
          "type": "platform",
          "version": "1.0.1"
       },
-      "Vibrant.QuerySearch": "3.4.0-*",
-      "Vibrant.QuerySearch.EntityFrameworkCore": "3.4.0-*"
+      "Vibrant.QuerySearch": "6.0.0-*",
+      "Vibrant.QuerySearch.EntityFrameworkCore": "6.0.0-*"
    },
 
    "tools": {
