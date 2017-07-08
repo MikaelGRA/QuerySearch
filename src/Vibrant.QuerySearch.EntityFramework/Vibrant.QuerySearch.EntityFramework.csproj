@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Provides an asynchronous operations over the original Vibrant.QuerySearch library.</Description>
+    <Copyright>Copyright (c) 2015-2017 MikaelGRA</Copyright>
+    <AssemblyTitle>QuerySearch for Entity Framework</AssemblyTitle>
+    <Version>6.0.0</Version>
+    <Authors>MikaelGRA</Authors>
+    <TargetFramework>net45</TargetFramework>
+    <AssemblyName>Vibrant.QuerySearch.EntityFramework</AssemblyName>
+    <PackageId>Vibrant.QuerySearch.EntityFramework</PackageId>
+    <PackageTags>queryable;entity-framework</PackageTags>
+    <PackageReleaseNotes>https://github.com/MikaelGRA/QuerySearch/blob/master/CHANGELOG.md</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/MikaelGRA/QuerySearch</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/MikaelGRA/QuerySearch/blob/master/LICENSE</PackageLicenseUrl>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vibrant.QuerySearch\Vibrant.QuerySearch.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EntityFramework" Version="6.0.0" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <Target Name="PostcompileScript" AfterTargets="Build">
+    <Exec Command="dotnet pack --no-build --configuration $(Configuration)" />
+  </Target>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>

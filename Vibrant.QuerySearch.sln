@@ -1,26 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3059BB00-E0A0-4C19-B331-848A1794AD93}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{9468A0D5-D3A5-4A13-84B5-C8C983830131}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Vibrant.QuerySearch", "src\Vibrant.QuerySearch\Vibrant.QuerySearch.xproj", "{9CCA545B-4A39-4D43-A539-BCDA1DE8BD83}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Vibrant.QuerySearch.Unity", "src\Vibrant.QuerySearch.Unity\Vibrant.QuerySearch.Unity.xproj", "{9BB1A293-213C-4A1B-AB81-E5D305C7A6ED}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Vibrant.QuerySearch.EntityFramework", "src\Vibrant.QuerySearch.EntityFramework\Vibrant.QuerySearch.EntityFramework.xproj", "{9B3B9D40-6F49-4844-A557-8EE900610FA3}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Vibrant.QuerySearch.EntityFrameworkCore", "src\Vibrant.QuerySearch.EntityFrameworkCore\Vibrant.QuerySearch.EntityFrameworkCore.xproj", "{EAE5459B-6372-40BC-BFCB-C5FE3F3EF137}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CA8D2CBC-16AA-4698-A8C8-BE77F9B95FC4}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Vibrant.QuerySearch.ConsoleApp", "test\Vibrant.QuerySearch.ConsoleApp\Vibrant.QuerySearch.ConsoleApp.xproj", "{5D7C8006-A2E3-44EB-94DE-B19A39F21808}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vibrant.QuerySearch", "src\Vibrant.QuerySearch\Vibrant.QuerySearch.csproj", "{9CCA545B-4A39-4D43-A539-BCDA1DE8BD83}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vibrant.QuerySearch.Unity", "src\Vibrant.QuerySearch.Unity\Vibrant.QuerySearch.Unity.csproj", "{9BB1A293-213C-4A1B-AB81-E5D305C7A6ED}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vibrant.QuerySearch.EntityFramework", "src\Vibrant.QuerySearch.EntityFramework\Vibrant.QuerySearch.EntityFramework.csproj", "{9B3B9D40-6F49-4844-A557-8EE900610FA3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vibrant.QuerySearch.EntityFrameworkCore", "src\Vibrant.QuerySearch.EntityFrameworkCore\Vibrant.QuerySearch.EntityFrameworkCore.csproj", "{EAE5459B-6372-40BC-BFCB-C5FE3F3EF137}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vibrant.QuerySearch.ConsoleApp", "test\Vibrant.QuerySearch.ConsoleApp\Vibrant.QuerySearch.ConsoleApp.csproj", "{5D7C8006-A2E3-44EB-94DE-B19A39F21808}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

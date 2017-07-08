@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Provides an implementation of IDependencyResolver implemented using Unity.</Description>
+    <Copyright>Copyright (c) 2015-2017 MikaelGRA</Copyright>
+    <AssemblyTitle>Unity DependencyResolver for QuerySearch</AssemblyTitle>
+    <Version>6.0.0</Version>
+    <Authors>MikaelGRA</Authors>
+    <TargetFramework>net45</TargetFramework>
+    <AssemblyName>Vibrant.QuerySearch.Unity</AssemblyName>
+    <PackageId>Vibrant.QuerySearch.Unity</PackageId>
+    <PackageTags>queryable;unity</PackageTags>
+    <PackageReleaseNotes>https://github.com/MikaelGRA/QuerySearch/blob/master/CHANGELOG.md</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/MikaelGRA/QuerySearch</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/MikaelGRA/QuerySearch/blob/master/LICENSE</PackageLicenseUrl>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vibrant.QuerySearch\Vibrant.QuerySearch.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <PackageReference Include="Unity" Version="4.0.1" />
+    <Reference Include="System.Runtime" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>
