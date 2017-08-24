@@ -31,7 +31,7 @@ namespace Vibrant.QuerySearch
 
          foreach( var propertyName in propertyPath.Split( '.' ) )
          {
-            propertyInfo = currentType.GetProperty( propertyName, FindPropertyFlags );
+            propertyInfo = currentType.GetTypeInfo().GetProperty( propertyName, FindPropertyFlags );
             if( propertyInfo == null )
             {
                throw new QuerySearchException( $"Could not find the property '{propertyName}' on the type '{currentType.FullName}'." );
@@ -103,12 +103,15 @@ namespace Vibrant.QuerySearch
          var genericWrapperType = typeof( WrappedObj<> ).MakeGenericType( type );
 
          var wrapper = genericWrapperType
+            .GetTypeInfo()
             .GetConstructor( new[] { type } )
             .Invoke( new[] { value } );
 
          return Expression.Property(
              Expression.Constant( wrapper ),
-             genericWrapperType.GetProperty( "Value" ) );
+             genericWrapperType
+               .GetTypeInfo()
+               .GetProperty( "Value" ) );
       }
 
       private class WrappedObj<TValue>

@@ -10,50 +10,92 @@ namespace Vibrant.QuerySearch.ConsoleApp
 {
    public class Program
    {
-      public static void Main( string[] args )
+      public static void Main(string[] args)
       {
          var services = new ServiceCollection();
 
          services.AddSingleton<ILocalizationService, DefaultLocalizationService>();
          services.AddSingleton<IQuerySearchProvider<Item>, ItemQuerySearchProvider>();
+         services.AddSingleton<IQuerySearchProvider<MyClass>, MyClassQuerySearchProvider>();
          services.AddSingleton<ItemQuerySearchProvider>();
 
          var provider = services.BuildServiceProvider();
 
-         DependencyResolver.Current = new DependencyResolverImpl( provider );
-         var id = Guid.NewGuid();
+         DependencyResolver.Current = new DependencyResolverImpl(provider);
 
-         var items = new List<Item>
+         var factory = new MyDbContextFactory();
+         using (var ctx = factory.CreateDbContext(args))
          {
-            new Item { Lol = "Hehehe", Id = id },
-            new Item { Lol = "ABC", Id = Guid.NewGuid() },
-         };
+            ctx.MyClasses.Add(new MyClass() { SomeText = "This is english!" });
+            ctx.MyClasses.Add(new MyClass() { SomeText = "Dette er dansk!" });
 
-         var form = new SearchForm
-         {
-            //OrderBy = "lol desc",
-            PageSize = 10,
-            //ParameterComposition = FilterComposition.Or,
-            //Parameters = new List<PropertyComparison>
-            //{
-            //   new PropertyComparison
-            //   {
-            //      Path = "lol",
-            //      Type = ComparisonType.Contains,
-            //      Value = "ehe"
-            //   },
-            //   new PropertyComparison
-            //   {
-            //      Path = "Id",
-            //      Type = ComparisonType.Equal,
-            //      Value = Guid.NewGuid()
-            //   },
-            //}
-         };
+            ctx.SaveChanges();
 
-         var result = items.AsQueryable().Search<Item, ItemQuerySearchProvider>( form );
 
-         Console.ReadKey();
+
+            var form = new SearchForm
+            {
+               PageSize = 10,
+               OrderByTerm = true,
+               Term = "other"
+               //ParameterComposition = FilterComposition.Or,
+               //Parameters = new List<PropertyComparison>
+               //{
+               //   new PropertyComparison
+               //   {
+               //      Path = "lol",
+               //      Type = ComparisonType.Contains,
+               //      Value = "ehe"
+               //   },
+               //   new PropertyComparison
+               //   {
+               //      Path = "Id",
+               //      Type = ComparisonType.Equal,
+               //      Value = Guid.NewGuid()
+               //   },
+               //}
+            };
+
+            var result = ctx.MyClasses.Search(form);
+
+            Console.ReadKey();
+         }
+
+
+
+         //var id = Guid.NewGuid();
+
+         //var items = new List<Item>
+         //{
+         //   new Item { Lol = "Hehehe", Id = id },
+         //   new Item { Lol = "ABC", Id = Guid.NewGuid() },
+         //};
+
+         //var form = new SearchForm
+         //{
+         //   //OrderBy = "lol desc",
+         //   PageSize = 10,
+         //   //ParameterComposition = FilterComposition.Or,
+         //   //Parameters = new List<PropertyComparison>
+         //   //{
+         //   //   new PropertyComparison
+         //   //   {
+         //   //      Path = "lol",
+         //   //      Type = ComparisonType.Contains,
+         //   //      Value = "ehe"
+         //   //   },
+         //   //   new PropertyComparison
+         //   //   {
+         //   //      Path = "Id",
+         //   //      Type = ComparisonType.Equal,
+         //   //      Value = Guid.NewGuid()
+         //   //   },
+         //   //}
+         //};
+
+         //var result = items.AsQueryable().Search<Item, ItemQuerySearchProvider>( form );
+
+         //Console.ReadKey();
       }
    }
 
@@ -61,7 +103,7 @@ namespace Vibrant.QuerySearch.ConsoleApp
    {
       private IServiceProvider _serviceProvider;
 
-      public DependencyResolverImpl( IServiceProvider serviceProvider )
+      public DependencyResolverImpl(IServiceProvider serviceProvider)
       {
          _serviceProvider = serviceProvider;
       }
@@ -74,10 +116,10 @@ namespace Vibrant.QuerySearch.ConsoleApp
 
    public class ItemQuerySearchProvider : DefaultQuerySearchProvider<Item>
    {
-      public ItemQuerySearchProvider( ILocalizationService localization ) : base( localization )
+      public ItemQuerySearchProvider(ILocalizationService localization) : base(localization)
       {
-         RegisterDefaultSort( q => q.OrderBy( x => x.Lol ) );
-         RegisterUniqueSort( q => q.ThenBy( x => x.Lol ) );
+         RegisterDefaultSort(q => q.OrderBy(x => x.Lol));
+         RegisterUniqueSort(q => q.ThenBy(x => x.Lol));
          Mode = PaginationMode.MinMaxPageSize;
       }
    }
