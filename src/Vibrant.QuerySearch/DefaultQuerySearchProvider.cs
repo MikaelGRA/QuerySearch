@@ -16,8 +16,8 @@ namespace Vibrant.QuerySearch
    /// <typeparam name="TEntity"></typeparam>
    public class DefaultQuerySearchProvider<TEntity> : IQuerySearchProvider<TEntity>
    {
-      private static readonly MethodInfo StartsWith = typeof( string ).GetMethod( "StartsWith", new[] { typeof( string ) } );
-      private static readonly MethodInfo Contains = typeof( string ).GetMethod( "Contains", new[] { typeof( string ) } );
+      private static readonly MethodInfo StartsWith = typeof( string ).GetTypeInfo().GetMethod( "StartsWith", new[] { typeof( string ) } );
+      private static readonly MethodInfo Contains = typeof( string ).GetTypeInfo().GetMethod( "Contains", new[] { typeof( string ) } );
 
       private static readonly HashSet<string> AllowedUniqueSortMethods = new HashSet<string> { "ThenBy", "ThenByDescending" };
       private static readonly HashSet<string> AllowedDefaultSortMethods = new HashSet<string> { "OrderBy", "OrderByDescending", "ThenBy", "ThenByDescending" };
@@ -318,7 +318,7 @@ namespace Vibrant.QuerySearch
                var memberAccessor = memberAccess.MemberAccessor;
                var propertyType = memberAccess.MemberType;
                var unwrappedPropertyType = propertyType.GetTypeInfo().IsGenericType && propertyType.GetGenericTypeDefinition() == typeof( Nullable<> )
-                  ? propertyType.GetGenericArguments()[ 0 ]
+                  ? propertyType.GetTypeInfo().GetGenericArguments()[ 0 ]
                   : propertyType;
                var propertyValue = propertyComparison.GetValue();
 

@@ -13,10 +13,10 @@ namespace Vibrant.QuerySearch
    /// </summary>
    public static class DynamicQueryable
    {
-      internal static readonly MethodInfo OrderByMethod = typeof( Queryable ).GetMethods().Single( x => x.Name == "OrderBy" && x.IsGenericMethodDefinition == true && x.GetGenericArguments().Length == 2 && x.GetParameters().Length == 2 );
-      internal static readonly MethodInfo OrderByDescendingMethod = typeof( Queryable ).GetMethods().Single( x => x.Name == "OrderByDescending" && x.IsGenericMethodDefinition == true && x.GetGenericArguments().Length == 2 && x.GetParameters().Length == 2 );
-      internal static readonly MethodInfo ThenByMethod = typeof( Queryable ).GetMethods().Single( x => x.Name == "ThenBy" && x.IsGenericMethodDefinition == true && x.GetGenericArguments().Length == 2 && x.GetParameters().Length == 2 );
-      internal static readonly MethodInfo ThenByDescendingMethod = typeof( Queryable ).GetMethods().Single( x => x.Name == "ThenByDescending" && x.IsGenericMethodDefinition == true && x.GetGenericArguments().Length == 2 && x.GetParameters().Length == 2 );
+      internal static readonly MethodInfo OrderByMethod = typeof( Queryable ).GetTypeInfo().GetMethods().Single( x => x.Name == "OrderBy" && x.IsGenericMethodDefinition == true && x.GetGenericArguments().Length == 2 && x.GetParameters().Length == 2 );
+      internal static readonly MethodInfo OrderByDescendingMethod = typeof( Queryable ).GetTypeInfo().GetMethods().Single( x => x.Name == "OrderByDescending" && x.IsGenericMethodDefinition == true && x.GetGenericArguments().Length == 2 && x.GetParameters().Length == 2 );
+      internal static readonly MethodInfo ThenByMethod = typeof( Queryable ).GetTypeInfo().GetMethods().Single( x => x.Name == "ThenBy" && x.IsGenericMethodDefinition == true && x.GetGenericArguments().Length == 2 && x.GetParameters().Length == 2 );
+      internal static readonly MethodInfo ThenByDescendingMethod = typeof( Queryable ).GetTypeInfo().GetMethods().Single( x => x.Name == "ThenByDescending" && x.IsGenericMethodDefinition == true && x.GetGenericArguments().Length == 2 && x.GetParameters().Length == 2 );
 
       /// <summary>
       /// Sorts the queryable by the specified sort member accesses.
