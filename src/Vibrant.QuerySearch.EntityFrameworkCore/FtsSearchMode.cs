@@ -8,6 +8,7 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
    public enum FtsSearchMode
    {
       FreeText,
-      WeightedPrefixes
+      WeightedPrefixes,
+      WeightedPrefixesPlusReverse
    }
 }
