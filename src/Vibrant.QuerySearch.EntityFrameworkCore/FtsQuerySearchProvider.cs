@@ -29,7 +29,7 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
       /// <summary>
       /// Constructs an FtsQuerySearchProvider.
       /// </summary>
-      public FtsQuerySearchProvider(ILocalizationService localization) : base(localization)
+      public FtsQuerySearchProvider( ILocalizationService localization ) : base( localization )
       {
       }
 
@@ -54,93 +54,92 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
       /// </summary>
       /// <param name="term"></param>
       /// <returns></returns>
-      protected virtual string[] GetSearchColumns(string term)
+      protected virtual string[] GetSearchColumns( string term )
       {
          return new[] { "*" };
       }
 
-      private string GetSearchExpression(string term)
+      private string GetSearchExpression( string term )
       {
-         if (SearchMode == FtsSearchMode.FreeText)
+         if( SearchMode == FtsSearchMode.FreeText )
          {
             return term;
          }
-         else if(SearchMode == FtsSearchMode.WeightedPrefixes)
+         else if( SearchMode == FtsSearchMode.WeightedPrefixes )
          {
-            if (string.IsNullOrWhiteSpace(term))
+            if( string.IsNullOrWhiteSpace( term ) )
             {
                return null;
             }
 
-            var words = term.Split(SplitChars, StringSplitOptions.RemoveEmptyEntries);
-            if (words.Length == 0)
+            var words = term.Split( SplitChars, StringSplitOptions.RemoveEmptyEntries );
+            if( words.Length == 0 )
             {
                return null;
             }
 
-            var maxLength = words.Max(x => x.Length);
-            var isAbout = $"ISABOUT({string.Join(", ", words.Select(x => "\"" + x.Replace("\"", "") + "*\" WEIGHT (" + ((double)x.Length / maxLength).ToString("0.##", CultureInfo.InvariantCulture) + ")"))})";
+            var maxLength = words.Max( x => x.Length );
+            var isAbout = $"ISABOUT({string.Join( ", ", words.Select( x => "\"" + x.Replace( "\"", "" ) + "*\" WEIGHT (" + ( (double)x.Length / maxLength ).ToString( "0.##", CultureInfo.InvariantCulture ) + ")" ) )})";
             return isAbout;
          }
          else
          {
-            if (string.IsNullOrWhiteSpace(term))
+            if( string.IsNullOrWhiteSpace( term ) )
             {
                return null;
             }
 
-            var words = term.Split(SplitChars, StringSplitOptions.RemoveEmptyEntries);
-            if (words.Length == 0)
+            var words = term.Split( SplitChars, StringSplitOptions.RemoveEmptyEntries );
+            if( words.Length == 0 )
             {
                return null;
             }
-            var allWords = new string[words.Length * 2];
+            var allWords = new string[ words.Length * 2 ];
 
-            Array.Copy(words, allWords, words.Length);
-            for (int i = 0; i < words.Length; i++)
+            Array.Copy( words, allWords, words.Length );
+            for( int i = 0 ; i < words.Length ; i++ )
             {
-               var charArray = words[i].ToCharArray();
-               Array.Reverse(charArray);
-               allWords[words.Length + i] = new string(charArray);
+               var charArray = words[ i ].ToCharArray();
+               Array.Reverse( charArray );
+               allWords[ words.Length + i ] = new string( charArray );
             }
 
-            var maxLength = allWords.Max(x => x.Length);
-            var isAbout = $"ISABOUT({string.Join(", ", allWords.Select(x => "\"" + x.Replace("\"", "") + "*\" WEIGHT (" + ((double)x.Length / maxLength).ToString("0.##", CultureInfo.InvariantCulture) + ")"))})";
+            var maxLength = allWords.Max( x => x.Length );
+            var isAbout = $"ISABOUT({string.Join( ", ", allWords.Select( x => "\"" + x.Replace( "\"", "" ) + "*\" WEIGHT (" + ( (double)x.Length / maxLength ).ToString( "0.##", CultureInfo.InvariantCulture ) + ")" ) )})";
             return isAbout;
          }
       }
 
       private string GetSearchTable()
       {
-         switch (SearchMode)
+         switch( SearchMode )
          {
             case FtsSearchMode.FreeText:
                return "FREETEXTTABLE";
             case FtsSearchMode.WeightedPrefixes:
-               return "CONTAINSTABLE";
             case FtsSearchMode.WeightedPrefixesPlusReverse:
                return "CONTAINSTABLE";
             default:
-               throw new InvalidOperationException("SearchMode is not set correctly.");
+               throw new InvalidOperationException( "SearchMode is not set correctly." );
          }
       }
 
-      private string CreateBaseQuery(string term)
+      private string CreateBaseQuery( string term )
       {
-         return $"SELECT {TableAlias}.* FROM {GetTableName()} AS {TableAlias} INNER JOIN {GetSearchTable()}({GetTableName()}, ({string.Join(", ", GetSearchColumns(term))}), {{0}} ) AS {KeyTable} ON {TableAlias}.{GetKeyColumnName()} = {KeyTable}.[KEY]";
+         return $"SELECT {TableAlias}.* FROM {GetTableName()} AS {TableAlias} INNER JOIN {GetSearchTable()}({GetTableName()}, ({string.Join( ", ", GetSearchColumns( term ) )}), {{0}} ) AS {KeyTable} ON {TableAlias}.{GetKeyColumnName()} = {KeyTable}.[KEY]";
       }
 
-      private string CreateOrderBy(int offset, int fetch)
+      private string CreateOrderBy( int offset, int fetch )
       {
          return $"ORDER BY {KeyTable}.RANK DESC, {TableAlias}.{GetUniqueColumnSort()} OFFSET {offset} ROWS FETCH NEXT {fetch} ROWS ONLY";
       }
 
-      public override IQueryable<TEntity> ApplyWhere(IQueryable<TEntity> query, IFilterForm filteringForm)
+      public override IQueryable<TEntity> ApplyWhere( IQueryable<TEntity> query, IFilterForm filteringForm )
       {
          var pageForm = filteringForm as IPageForm;
-         if (pageForm == null)
+         if( pageForm == null )
          {
-            throw new QuerySearchException("The IFilterForm must also implement IPageFrom in order to support FtsQuerySearchProvider.");
+            throw new QuerySearchException( "The IFilterForm must also implement IPageFrom in order to support FtsQuerySearchProvider." );
          }
 
          // keep track of the untouched query
@@ -148,23 +147,23 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
 
          // we only need to perform this 'special' filtering in case there is a term
          var rawTerm = filteringForm.GetTerm();
-         var term = GetSearchExpression(rawTerm);
-         if (!string.IsNullOrWhiteSpace(term))
+         var term = GetSearchExpression( rawTerm );
+         if( !string.IsNullOrWhiteSpace( term ) )
          {
             // rewrite the 'base query' to include a full text filter (will be placed in a sub query)
-            string baseQuery = CreateBaseQuery(rawTerm);
-            query = query.FromSql(baseQuery, term);
+            string baseQuery = CreateBaseQuery( rawTerm );
+            query = query.FromSql( baseQuery, term );
 
             // apply the default where clause onto the query (will be placed in an outer query)
-            query = base.ApplyWhere(query, filteringForm);
+            query = base.ApplyWhere( query, filteringForm );
 
             // get the sql representing the query
             var sql = query.ToSql();
 
             // create a reader for our sql, and a builder to build a new query
-            var reader = new StringReader(sql);
+            var reader = new StringReader( sql );
             var builder = new StringBuilder();
-            builder.AppendLine(baseQuery);
+            builder.AppendLine( baseQuery );
 
             // variable to keep track of the alias used for the table in the outer query
             string usedAlias = string.Empty;
@@ -173,55 +172,55 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
             bool iteratingRelevantSql = false;
 
             string line = null;
-            while ((line = reader.ReadLine()) != null)
+            while( ( line = reader.ReadLine() ) != null )
             {
-               if (line.StartsWith(") AS "))
+               if( line.StartsWith( ") AS " ) )
                {
                   // this line marks the start of WHERE/ORDER BY/WHATEVER of the outer query
-                  usedAlias = line.Substring(5);
+                  usedAlias = line.Substring( 5 );
                   iteratingRelevantSql = true;
                }
-               else if (iteratingRelevantSql)
+               else if( iteratingRelevantSql )
                {
                   // this writes the WHERE clause + other stuff
-                  builder.AppendLine(line.Replace(usedAlias, TableAlias));
+                  builder.AppendLine( line.Replace( usedAlias, TableAlias ) );
                }
             }
 
             // Use the untouched query and append our own homebrew where clause
-            return untouchedQuery.FromSql(builder.ToString(), term);
+            return untouchedQuery.FromSql( builder.ToString(), term );
          }
          else
          {
             // no special filtering to be performed
-            return base.ApplyWhere(query, filteringForm);
+            return base.ApplyWhere( query, filteringForm );
          }
       }
 
-      public override PaginationResult<TEntity> ApplyPagination(IQueryable<TEntity> query, IPageForm form)
+      public override PaginationResult<TEntity> ApplyPagination( IQueryable<TEntity> query, IPageForm form )
       {
          var filteringForm = form as IFilterForm;
-         if (filteringForm == null)
+         if( filteringForm == null )
          {
-            throw new QuerySearchException("The IPageForm must also implement IFilterForm in order to support FtsQuerySearchProvider.");
+            throw new QuerySearchException( "The IPageForm must also implement IFilterForm in order to support FtsQuerySearchProvider." );
          }
 
-         var term = GetSearchExpression(filteringForm.GetTerm());
-         if (!string.IsNullOrWhiteSpace(term))
+         var term = GetSearchExpression( filteringForm.GetTerm() );
+         if( !string.IsNullOrWhiteSpace( term ) )
          {
             // keep track of the untouched query
             var untouchedQuery = query;
 
             // apply where clause again (so we the outer query will be 'complete', and can simply replace what comes after the SELECT of the inner query)
-            query = base.ApplyWhere(query, filteringForm);
+            query = base.ApplyWhere( query, filteringForm );
 
             // if we are not sorting by the term, we should simply use the default mechanism
             bool isAlreadySorted = false;
-            if (!form.SortByTermRank())
+            if( !form.SortByTermRank() )
             {
                isAlreadySorted = true;
 
-               var result = base.ApplyPagination(query, form);
+               var result = base.ApplyPagination( query, form );
                query = result.Query;
             }
 
@@ -229,7 +228,7 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
             var sql = query.ToSql();
 
             // create a reader for our sql, and a builder to build a new query
-            var reader = new StringReader(sql);
+            var reader = new StringReader( sql );
             var builder = new StringBuilder();
 
             // variable to keep track of the alias used for the table in the outer query
@@ -239,31 +238,31 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
             bool iteratingRelevantSql = false;
 
             string line = null;
-            while ((line = reader.ReadLine()) != null)
+            while( ( line = reader.ReadLine() ) != null )
             {
-               if (line == "FROM (")
+               if( line == "FROM (" )
                {
                   // read our base query
                   var baseQuery = reader.ReadLine();
-                  builder.AppendLine(baseQuery);
+                  builder.AppendLine( baseQuery );
 
                   // this line marks the start of the sub query
                }
-               else if (line.StartsWith(") AS "))
+               else if( line.StartsWith( ") AS " ) )
                {
                   // this line marks the start of WHERE/ORDER BY/WHATEVER of the outer query
-                  usedAlias = line.Substring(5);
+                  usedAlias = line.Substring( 5 );
 
                   iteratingRelevantSql = true;
                }
-               else if (iteratingRelevantSql)
+               else if( iteratingRelevantSql )
                {
-                  builder.AppendLine(line);
+                  builder.AppendLine( line );
                }
             }
 
             // if we have NOT already appended a OFFSET/FETCH query part, do that now
-            if (!isAlreadySorted)
+            if( !isAlreadySorted )
             {
                // calculate fetch and offset
                int fetch = 0;
@@ -272,27 +271,27 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
                var page = form.GetPage();
                var skip = form.GetSkip();
                var take = form.GetTake();
-               if (Mode == PaginationMode.SkipAndTake)
+               if( Mode == PaginationMode.SkipAndTake )
                {
-                  if (skip.HasValue)
+                  if( skip.HasValue )
                   {
                      offset = skip.Value;
                   }
                   int actualTake = MaxTake;
-                  if (take.HasValue && take.Value < MaxTake)
+                  if( take.HasValue && take.Value < MaxTake )
                   {
                      fetch = MaxTake;
                   }
                }
                else
                {
-                  var pageSize = GetPageSize(form);
+                  var pageSize = GetPageSize( form );
                   int actualPage = 0;
-                  if (page.HasValue)
+                  if( page.HasValue )
                   {
                      actualPage = page.Value;
                   }
-                  else if (skip.HasValue)
+                  else if( skip.HasValue )
                   {
                      actualPage = skip.Value / pageSize;
                   }
@@ -302,23 +301,23 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
                }
 
                // we have NOT ordered sql, which means that we need to do it based on the term
-               builder.AppendLine(CreateOrderBy(offset, fetch));
+               builder.AppendLine( CreateOrderBy( offset, fetch ) );
             }
 
             // calculate the final sql and use it as the base on the untouched query
-            var rawSql = builder.Replace(usedAlias, TableAlias).ToString();
+            var rawSql = builder.Replace( usedAlias, TableAlias ).ToString();
 
             // parameterize the final sql
-            int parameterStart = rawSql.IndexOf(", N'") + 2;
-            int parameterEnd = rawSql.IndexOf("' ) AS") + 1;
-            string parameter = rawSql.Substring(parameterStart, parameterEnd - parameterStart);
+            int parameterStart = rawSql.IndexOf( ", N'" ) + 2;
+            int parameterEnd = rawSql.IndexOf( "' ) AS" ) + 1;
+            string parameter = rawSql.Substring( parameterStart, parameterEnd - parameterStart );
 
-            var finalSql = rawSql.Replace(parameter, "{0}");
-            return CreatePaginationResult(untouchedQuery.FromSql(finalSql, term), form, false);
+            var finalSql = rawSql.Replace( parameter, "{0}" );
+            return CreatePaginationResult( untouchedQuery.FromSql( finalSql, term ), form, false );
          }
          else
          {
-            return base.ApplyPagination(query, form);
+            return base.ApplyPagination( query, form );
          }
       }
    }

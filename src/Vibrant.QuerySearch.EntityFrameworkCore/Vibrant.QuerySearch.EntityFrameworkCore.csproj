@@ -4,7 +4,7 @@
     <Description>Provides an asynchronous operations over the original Vibrant.QuerySearch library.</Description>
     <Copyright>Copyright (c) 2015-2017 MikaelGRA</Copyright>
     <AssemblyTitle>QuerySearch for Entity Framework Core</AssemblyTitle>
-    <Version>7.0.0</Version>
+    <Version>7.1.0</Version>
     <Authors>MikaelGRA</Authors>
     <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <AssemblyName>Vibrant.QuerySearch.EntityFrameworkCore</AssemblyName>
