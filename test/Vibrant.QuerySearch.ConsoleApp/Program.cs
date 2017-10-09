@@ -26,8 +26,12 @@ namespace Vibrant.QuerySearch.ConsoleApp
          var factory = new MyDbContextFactory();
          using (var ctx = factory.CreateDbContext(args))
          {
-            ctx.MyClasses.Add(new MyClass() { SomeText = "This is english!" });
-            ctx.MyClasses.Add(new MyClass() { SomeText = "Dette er dansk!" });
+            var term = "This is english";
+            var termReversed = term.Reverse();
+            var output = new string(termReversed.ToArray());
+
+          //  ctx.MyClasses.Add(new MyClass() { SomeText = $"{term}. {output}" });
+          //  ctx.MyClasses.Add(new MyClass() { SomeText = "Dette er dansk!" });
 
             ctx.SaveChanges();
 
@@ -37,7 +41,7 @@ namespace Vibrant.QuerySearch.ConsoleApp
             {
                PageSize = 10,
                OrderByTerm = true,
-               Term = "other"
+               Term = "english"
                //ParameterComposition = FilterComposition.Or,
                //Parameters = new List<PropertyComparison>
                //{
