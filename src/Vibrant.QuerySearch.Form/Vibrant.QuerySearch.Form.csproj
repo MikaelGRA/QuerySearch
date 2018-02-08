@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+     <Description>Provides IQueryable extensions for easily working with filtering and pagination.</Description>
+     <Copyright>Copyright (c) 2015-2017 MikaelGRA</Copyright>
+     <AssemblyTitle>QuerySearch for .NET</AssemblyTitle>
+     <Version>8.0.0</Version>
+     <Authors>MikaelGRA</Authors>
+     <TargetFrameworks>net45;netstandard1.6</TargetFrameworks>
+     <AssemblyName>Vibrant.QuerySearch.Form</AssemblyName>
+     <PackageId>Vibrant.QuerySearch.Form</PackageId>
+     <PackageTags>queryable;entity-framework</PackageTags>
+     <PackageReleaseNotes>https://github.com/MikaelGRA/QuerySearch/blob/master/CHANGELOG.md</PackageReleaseNotes>
+     <PackageProjectUrl>https://github.com/MikaelGRA/QuerySearch</PackageProjectUrl>
+     <PackageLicenseUrl>https://github.com/MikaelGRA/QuerySearch/blob/master/LICENSE</PackageLicenseUrl>
+     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+  </PropertyGroup>
+
+   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <GenerateDocumentationFile>true</GenerateDocumentationFile>
+   </PropertyGroup>
+
+   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+      <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
+   </ItemGroup>
+
+</Project>

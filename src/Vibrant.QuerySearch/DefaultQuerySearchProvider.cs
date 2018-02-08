@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
+using Vibrant.QuerySearch.Form;
 using Vibrant.QuerySearch.Helpers;
 
 namespace Vibrant.QuerySearch
@@ -307,7 +308,6 @@ namespace Vibrant.QuerySearch
          }
 
          Expression<Func<TEntity, bool>> parameterPredicate = null;
-         var composition = filteringForm.GetFilterComposition();
          var parameters = filteringForm.GetAdditionalFilters();
          if( parameters != null )
          {
@@ -365,7 +365,7 @@ namespace Vibrant.QuerySearch
                parameterPredicate = AddExpression(
                   parameterPredicate,
                   Expression.Lambda<Func<TEntity, bool>>( left, _parameter ),
-                  composition == FilterComposition.And ? ExpressionType.AndAlso : ExpressionType.OrElse );
+                  ExpressionType.AndAlso );
             }
          }
 

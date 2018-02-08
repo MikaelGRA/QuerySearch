@@ -4,7 +4,7 @@
     <Description>Provides an implementation of IDependencyResolver implemented using Unity.</Description>
     <Copyright>Copyright (c) 2015-2017 MikaelGRA</Copyright>
     <AssemblyTitle>Unity DependencyResolver for QuerySearch</AssemblyTitle>
-    <Version>7.0.0</Version>
+    <Version>8.0.0</Version>
     <Authors>MikaelGRA</Authors>
     <TargetFramework>net45</TargetFramework>
     <AssemblyName>Vibrant.QuerySearch.Unity</AssemblyName>

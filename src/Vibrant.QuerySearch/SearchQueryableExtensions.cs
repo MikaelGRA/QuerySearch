@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Vibrant.QuerySearch.Form;
 
 namespace Vibrant.QuerySearch
 {
@@ -50,9 +51,7 @@ namespace Vibrant.QuerySearch
          var paginationProvider = registry.Resolve<IQuerySearchProvider<TEntity>>() ?? registry.Resolve<IPaginationProvider<TEntity>>();
          if( paginationProvider == null )
             throw new QuerySearchException( $"No IPaginationProvider has been registered for the type '{typeof( TEntity ).FullName}'." );
-
-         var fullCount = query.Count();
-
+         
          query = filterProvider.ApplyWhere( query, search );
 
          var filteredCount = query.Count();
@@ -68,9 +67,7 @@ namespace Vibrant.QuerySearch
 
          return new QuerySearchResult<TEntity>
          {
-            FullCount = fullCount,
             FilteredCount = filteredCount,
-            FullPageCount = PaginationHelper.GetPageCount( fullCount, result.PageSize ),
             FilteredPageCount = PaginationHelper.GetPageCount( filteredCount, result.PageSize ),
             Page = result.Page,
             Skip = result.Skip,
@@ -116,9 +113,7 @@ namespace Vibrant.QuerySearch
          var provider = registry.Resolve<TQuerySearchProvider>();
          if( provider == null )
             throw new QuerySearchException( $"No IQuerySearchProvider has been registered of the type '{typeof( TQuerySearchProvider ).FullName}'." );
-
-         var fullCount = query.Count();
-
+         
          query = provider.ApplyWhere( query, search );
 
          var filteredCount = query.Count();
@@ -134,9 +129,7 @@ namespace Vibrant.QuerySearch
 
          return new QuerySearchResult<TEntity>
          {
-            FullCount = fullCount,
             FilteredCount = filteredCount,
-            FullPageCount = PaginationHelper.GetPageCount( fullCount, result.PageSize ),
             FilteredPageCount = PaginationHelper.GetPageCount( filteredCount, result.PageSize ),
             Page = result.Page,
             Skip = result.Skip,

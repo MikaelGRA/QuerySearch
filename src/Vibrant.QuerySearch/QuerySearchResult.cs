@@ -13,11 +13,6 @@ namespace Vibrant.QuerySearch
    public class QuerySearchResult<TEntity>
    {
       /// <summary>
-      /// Gets or sets the full count of entities.
-      /// </summary>
-      public int FullCount { get; set; }
-
-      /// <summary>
       /// Gets or sets the filtered count of entities.
       /// </summary>
       public int FilteredCount { get; set; }
@@ -36,11 +31,6 @@ namespace Vibrant.QuerySearch
       /// Gets or sets the number of pages available in the filtered count.
       /// </summary>
       public int? FilteredPageCount { get; set; }
-
-      /// <summary>
-      /// Gets or sets the number of pages available in the total count.
-      /// </summary>
-      public int? FullPageCount { get; set; }
 
       /// <summary>
       /// Gets or sets the current page number.

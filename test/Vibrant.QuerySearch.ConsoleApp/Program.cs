@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Vibrant.QuerySearch.EntityFrameworkCore;
+using Vibrant.QuerySearch.Form;
 
 namespace Vibrant.QuerySearch.ConsoleApp
 {

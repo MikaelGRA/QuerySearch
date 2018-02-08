@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.10
+VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3059BB00-E0A0-4C19-B331-848A1794AD93}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vibrant.QuerySearch.EntityFrameworkCore", "src\Vibrant.QuerySearch.EntityFrameworkCore\Vibrant.QuerySearch.EntityFrameworkCore.csproj", "{EAE5459B-6372-40BC-BFCB-C5FE3F3EF137}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vibrant.QuerySearch.ConsoleApp", "test\Vibrant.QuerySearch.ConsoleApp\Vibrant.QuerySearch.ConsoleApp.csproj", "{5D7C8006-A2E3-44EB-94DE-B19A39F21808}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vibrant.QuerySearch.Form", "src\Vibrant.QuerySearch.Form\Vibrant.QuerySearch.Form.csproj", "{C4CAE61E-2EB4-46F0-94C3-E803A3A253D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{5D7C8006-A2E3-44EB-94DE-B19A39F21808}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D7C8006-A2E3-44EB-94DE-B19A39F21808}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D7C8006-A2E3-44EB-94DE-B19A39F21808}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4CAE61E-2EB4-46F0-94C3-E803A3A253D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4CAE61E-2EB4-46F0-94C3-E803A3A253D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4CAE61E-2EB4-46F0-94C3-E803A3A253D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4CAE61E-2EB4-46F0-94C3-E803A3A253D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -55,6 +61,7 @@ Global
 		{9B3B9D40-6F49-4844-A557-8EE900610FA3} = {3059BB00-E0A0-4C19-B331-848A1794AD93}
 		{EAE5459B-6372-40BC-BFCB-C5FE3F3EF137} = {3059BB00-E0A0-4C19-B331-848A1794AD93}
 		{5D7C8006-A2E3-44EB-94DE-B19A39F21808} = {9468A0D5-D3A5-4A13-84B5-C8C983830131}
+		{C4CAE61E-2EB4-46F0-94C3-E803A3A253D2} = {3059BB00-E0A0-4C19-B331-848A1794AD93}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23E4A60B-442F-4F6C-A33A-685F3554FE4E}

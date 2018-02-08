@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Vibrant.QuerySearch.Form;
 
 namespace Vibrant.QuerySearch.EntityFramework
 {
@@ -50,9 +51,7 @@ namespace Vibrant.QuerySearch.EntityFramework
          var paginationProvider = registry.Resolve<IQuerySearchProvider<TEntity>>() ?? registry.Resolve<IPaginationProvider<TEntity>>();
          if( paginationProvider == null )
             throw new QuerySearchException( $"No IPaginationProvider has been registered for the type '{typeof( TEntity ).FullName}'." );
-
-         var fullCount = await query.CountAsync().ConfigureAwait( false );
-
+         
          query = filterProvider.ApplyWhere( query, search );
 
          var filteredCount = await query.CountAsync().ConfigureAwait( false );
@@ -68,9 +67,7 @@ namespace Vibrant.QuerySearch.EntityFramework
 
          return new QuerySearchResult<TEntity>
          {
-            FullCount = fullCount,
             FilteredCount = filteredCount,
-            FullPageCount = PaginationHelper.GetPageCount( fullCount, result.PageSize ),
             FilteredPageCount = PaginationHelper.GetPageCount( filteredCount, result.PageSize ),
             Page = result.Page,
             Skip = result.Skip,
@@ -135,9 +132,7 @@ namespace Vibrant.QuerySearch.EntityFramework
 
          return new QuerySearchResult<TEntity>
          {
-            FullCount = fullCount,
             FilteredCount = filteredCount,
-            FullPageCount = PaginationHelper.GetPageCount( fullCount, result.PageSize ),
             FilteredPageCount = PaginationHelper.GetPageCount( filteredCount, result.PageSize ),
             Page = result.Page,
             Skip = result.Skip,

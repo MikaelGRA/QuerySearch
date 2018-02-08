@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Vibrant.QuerySearch.Form;
 
 namespace Vibrant.QuerySearch.EntityFrameworkCore
 {
@@ -68,9 +69,7 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
 
          return new QuerySearchResult<TEntity>
          {
-            FullCount = fullCount,
             FilteredCount = filteredCount,
-            FullPageCount = PaginationHelper.GetPageCount( fullCount, result.PageSize ),
             FilteredPageCount = PaginationHelper.GetPageCount( filteredCount, result.PageSize ),
             Page = result.Page,
             Skip = result.Skip,
@@ -135,9 +134,7 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
 
          return new QuerySearchResult<TEntity>
          {
-            FullCount = fullCount,
             FilteredCount = filteredCount,
-            FullPageCount = PaginationHelper.GetPageCount( fullCount, result.PageSize ),
             FilteredPageCount = PaginationHelper.GetPageCount( filteredCount, result.PageSize ),
             Page = result.Page,
             Skip = result.Skip,
