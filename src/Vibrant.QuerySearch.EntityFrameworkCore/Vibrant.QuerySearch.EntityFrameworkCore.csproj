@@ -4,7 +4,7 @@
     <Description>Provides an asynchronous operations over the original Vibrant.QuerySearch library.</Description>
     <Copyright>Copyright (c) 2015-2017 MikaelGRA</Copyright>
     <AssemblyTitle>QuerySearch for Entity Framework Core</AssemblyTitle>
-    <Version>8.1.0</Version>
+    <Version>8.1.1</Version>
     <Authors>MikaelGRA</Authors>
     <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <AssemblyName>Vibrant.QuerySearch.EntityFrameworkCore</AssemblyName>
@@ -21,8 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.1.1" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

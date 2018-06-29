@@ -31,10 +31,10 @@ namespace Vibrant.QuerySearch.ConsoleApp
             var termReversed = term.Reverse();
             var output = new string(termReversed.ToArray());
 
-          //  ctx.MyClasses.Add(new MyClass() { SomeText = $"{term}. {output}" });
-          //  ctx.MyClasses.Add(new MyClass() { SomeText = "Dette er dansk!" });
+            //ctx.MyClasses.Add( new MyClass() { SomeText = $"{term}. {output}" } );
+            //ctx.MyClasses.Add( new MyClass() { SomeText = "Dette er dansk!" } );
 
-            ctx.SaveChanges();
+            //ctx.SaveChanges();
 
 
 
