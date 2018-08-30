@@ -28,9 +28,6 @@ namespace Vibrant.QuerySearch.EntityFrameworkCore
 
       public static string ToSql<TEntity>( this IQueryable<TEntity> query ) where TEntity : class
       {
-         if( !( query is EntityQueryable<TEntity> ) && !( query is InternalDbSet<TEntity> ) )
-            throw new ArgumentException();
-
          var queryCompiler = (IQueryCompiler)_queryCompilerField.GetValue( query.Provider );
          var queryModelGenerator = (IQueryModelGenerator)_queryModelGeneratorField.GetValue( queryCompiler );
          var queryModel = queryModelGenerator.ParseQuery( query.Expression );

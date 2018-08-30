@@ -5,34 +5,52 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using System.IO;
 using Microsoft.Extensions.Configuration;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Vibrant.QuerySearch.ConsoleApp
 {
-   public class MyDbContext : DbContext
-   {
-      public MyDbContext(DbContextOptions<MyDbContext> options)
-         : base(options)
-      {
-      }
+    public class MyDbContext : DbContext
+    {
+        public MyDbContext(DbContextOptions<MyDbContext> options)
+           : base(options)
+        {
+        }
 
-      public DbSet<MyClass> MyClasses { get; set; }
-   }
+        public DbSet<MyClass> MyClasses { get; set; }
 
-   public class MyClass
-   {
-      public int Id { get; set; }
+        public DbSet<MyRefClass> MyRefClasses { get; set; }
+    }
 
-      public string SomeText { get; set; }
-   }
-   public class MyDbContextFactory : IDesignTimeDbContextFactory<MyDbContext>
-   {
-      public MyDbContext CreateDbContext(string[] args)
-      {
-         var builder = new DbContextOptionsBuilder<MyDbContext>();
+    public class MyClass
+    {
+        public int Id { get; set; }
 
-         builder.UseSqlServer("Initial Catalog=MyQuerySearchDatabase;Data Source=localhost;User Id=sa;MultipleActiveResultSets=true");
+        public string SomeText { get; set; }
 
-         return new MyDbContext(builder.Options);
-      }
-   }
+        public MyRefClass MyRefClass { get; set; }
+
+    }
+
+    public class MyRefClass
+    {
+        [Key, ForeignKey("MyClass")]
+        public int Id { get; set; }
+
+        public string Whatver { get; set; }
+
+        public MyClass MyClass { get; set; }
+    }
+
+    public class MyDbContextFactory : IDesignTimeDbContextFactory<MyDbContext>
+    {
+        public MyDbContext CreateDbContext(string[] args)
+        {
+            var builder = new DbContextOptionsBuilder<MyDbContext>();
+
+            builder.UseSqlServer("Initial Catalog=MyQuerySearchDatabase;Data Source=localhost;User Id=sa;MultipleActiveResultSets=true");
+
+            return new MyDbContext(builder.Options);
+        }
+    }
 }
