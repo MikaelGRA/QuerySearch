@@ -26,58 +26,53 @@ namespace Vibrant.QuerySearch
       /// <param name="parameter">The parameter that was used to create the sort member accesses.</param>
       /// <param name="sortMemberAccesses">The sort member accesses that the query will be sorted by.</param>
       /// <returns>An ordered queryable.</returns>
-      public static IQueryable<TEntity> OrderBy<TEntity>( this IQueryable<TEntity> query, ParameterExpression parameter, IEnumerable<SortMemberAccess> sortMemberAccesses )
+      public static IQueryable<TEntity> OrderBy<TEntity>( this IQueryable<TEntity> query, ParameterExpression parameter, SortMemberAccess sortMemberAccess )
       {
-         bool hasSorted = false;
-         foreach( var sortMemberAccess in sortMemberAccesses )
-         {
-            var delegateType = typeof( Func<,> ).MakeGenericType( typeof( TEntity ), sortMemberAccess.MemberType );
-            var lambda = Expression.Lambda( delegateType, sortMemberAccess.MemberAccessor, parameter );
+         var delegateType = typeof( Func<,> ).MakeGenericType( typeof( TEntity ), sortMemberAccess.MemberType );
+         var lambda = Expression.Lambda( delegateType, sortMemberAccess.MemberAccessor, parameter );
 
-            MethodInfo orderingMethod;
-            if( !hasSorted )
+         MethodInfo orderingMethod;
+         if( query is IOrderedQueryable<TEntity> )
+         {
+            if( sortMemberAccess.SortDirection == SortDirection.Descending )
             {
-               hasSorted = true;
-               if( sortMemberAccess.SortDirection == SortDirection.Descending )
-               {
-                  orderingMethod = OrderByDescendingMethod;
-               }
-               else if( sortMemberAccess.SortDirection == SortDirection.Ascending )
-               {
-                  orderingMethod = OrderByMethod;
-               }
-               else
-               {
-                  throw new QuerySearchException( $"Unrecognized sort direction enum value: '{sortMemberAccess.SortDirection}'." );
-               }
+               orderingMethod = ThenByDescendingMethod;
+            }
+            else if( sortMemberAccess.SortDirection == SortDirection.Ascending )
+            {
+               orderingMethod = ThenByMethod;
             }
             else
             {
-               if( sortMemberAccess.SortDirection == SortDirection.Descending )
-               {
-                  orderingMethod = ThenByDescendingMethod;
-               }
-               else if( sortMemberAccess.SortDirection == SortDirection.Ascending )
-               {
-                  orderingMethod = ThenByMethod;
-               }
-               else
-               {
-                  throw new QuerySearchException( $"Unrecognized sort direction enum value: '{sortMemberAccess.SortDirection}'." );
-               }
+               throw new QuerySearchException( $"Unrecognized sort direction enum value: '{sortMemberAccess.SortDirection}'." );
             }
-
-            query = (IQueryable<TEntity>)orderingMethod.MakeGenericMethod( typeof( TEntity ), sortMemberAccess.MemberType ).Invoke( null, new object[] { query, lambda } );
          }
+         else
+         {
+            if( sortMemberAccess.SortDirection == SortDirection.Descending )
+            {
+               orderingMethod = OrderByDescendingMethod;
+            }
+            else if( sortMemberAccess.SortDirection == SortDirection.Ascending )
+            {
+               orderingMethod = OrderByMethod;
+            }
+            else
+            {
+               throw new QuerySearchException( $"Unrecognized sort direction enum value: '{sortMemberAccess.SortDirection}'." );
+            }
+         }
+
+         query = (IQueryable<TEntity>)orderingMethod.MakeGenericMethod( typeof( TEntity ), sortMemberAccess.MemberType ).Invoke( null, new object[] { query, lambda } );
 
          return query;
       }
 
-      public static IQueryable<TEntity> OrderBy<TEntity>( this IQueryable<TEntity> query, string orderBy )
-      {
-         var parameter = Expression.Parameter( typeof( TEntity ), "x" );
+      //public static IQueryable<TEntity> OrderBy<TEntity>( this IQueryable<TEntity> query, string orderBy )
+      //{
+      //   var parameter = Expression.Parameter( typeof( TEntity ), "x" );
 
-         return OrderBy( query, parameter, ExpressionHelper.CalculateSortMemberAccesses( parameter, orderBy ) );
-      }
+      //   return OrderBy( query, parameter, ExpressionHelper.CalculateSortMemberAccesses( parameter, orderBy ) );
+      //}
    }
 }

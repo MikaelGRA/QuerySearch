@@ -21,7 +21,7 @@ namespace Vibrant.QuerySearch
       /// <returns></returns>
       public static MemberAccess GetMemberAccess( this IMemberComparison comparison, ParameterExpression parameter )
       {
-         return ExpressionHelper.CalculateMemberAccess( parameter, comparison.GetPath() );
+         return ExpressionHelper.CalculateMemberAccess( parameter, comparison.GetPath(), false );
       }
    }
 }

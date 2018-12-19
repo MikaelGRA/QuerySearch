@@ -106,8 +106,20 @@ namespace Vibrant.QuerySearch
          if( sorting != null && sorting.Count > 0 )
          {
             // first order by user specified sorting
-            query = query.OrderBy( _parameter, sorting );
-            alreadySortedByPropertyPaths.AddRange( sorting.Select( x => x.PropertyPath ) );
+
+            foreach( var sort in sorting )
+            {
+               if( sort.MemberAccessor != null )
+               {
+                  query = query.OrderBy( _parameter, sort );
+               }
+               else
+               {
+                  query = ApplyManualOrdering( query, sort.PropertyPath, sort.SortDirection );
+               }
+
+               alreadySortedByPropertyPaths.Add( sort.PropertyPath );
+            }
 
             query = ApplyUniqueSort( alreadySortedByPropertyPaths, (IOrderedQueryable<TEntity>)query );
          }
@@ -118,6 +130,11 @@ namespace Vibrant.QuerySearch
          }
 
          return CreatePaginationResult( query, form, true );
+      }
+
+      protected virtual IQueryable<TEntity> ApplyManualOrdering( IQueryable<TEntity> query, string propertyPath, SortDirection direction )
+      {
+         return query;
       }
 
       protected PaginationResult<TEntity> CreatePaginationResult( IQueryable<TEntity> query, IPageForm form, bool applyPagination )

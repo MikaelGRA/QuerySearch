@@ -23,7 +23,7 @@ namespace Vibrant.QuerySearch
       /// <param name="parameter">The parameter to access members upon.</param>
       /// <param name="propertyPath">The property path to traverse.</param>
       /// <returns>A MemberAccess representing acessing the property path.</returns>
-      public static MemberAccess CalculateMemberAccess( ParameterExpression parameter, string propertyPath )
+      public static MemberAccess CalculateMemberAccess( ParameterExpression parameter, string propertyPath, bool allowNotFound )
       {
          Type currentType = parameter.Type;
          Expression currentExpression = null;
@@ -31,16 +31,27 @@ namespace Vibrant.QuerySearch
 
          foreach( var propertyName in propertyPath.Split( '.' ) )
          {
-            propertyInfo = currentType.GetTypeInfo().GetProperty( propertyName, FindPropertyFlags );
+            propertyInfo = currentType?.GetTypeInfo().GetProperty( propertyName, FindPropertyFlags );
             if( propertyInfo == null )
             {
-               throw new QuerySearchException( $"Could not find the property '{propertyName}' on the type '{currentType.FullName}'." );
+               if( allowNotFound )
+               {
+                  currentType = null;
+                  currentExpression = null;
+               }
+               else
+               {
+                  throw new QuerySearchException( $"Could not find the property '{propertyName}' on the type '{currentType.FullName}'." );
+               }
             }
-            currentType = propertyInfo.PropertyType;
-            currentExpression = Expression.Property( currentExpression ?? parameter, propertyInfo );
+            else
+            {
+               currentType = propertyInfo.PropertyType;
+               currentExpression = Expression.Property( currentExpression ?? parameter, propertyInfo );
+            }
          }
 
-         return new MemberAccess( propertyInfo.PropertyType, currentExpression, propertyPath );
+         return new MemberAccess( propertyInfo?.PropertyType, currentExpression, propertyPath );
       }
 
       /// <summary>
@@ -73,7 +84,7 @@ namespace Vibrant.QuerySearch
          }
 
          // create property getter for path...
-         var result = CalculateMemberAccess( parameter, propertyPath );
+         var result = CalculateMemberAccess( parameter, propertyPath, true );
 
          return result.WithSorting( sort );
       }
