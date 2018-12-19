@@ -24,7 +24,7 @@ namespace Vibrant.QuerySearch
       /// <typeparam name="TEntity"></typeparam>
       /// <param name="query">The query to be ordered.</param>
       /// <param name="parameter">The parameter that was used to create the sort member accesses.</param>
-      /// <param name="sortMemberAccesses">The sort member accesses that the query will be sorted by.</param>
+      /// <param name="sortMemberAccess">The sort member access that the query will be sorted by.</param>
       /// <returns>An ordered queryable.</returns>
       public static IQueryable<TEntity> OrderBy<TEntity>( this IQueryable<TEntity> query, ParameterExpression parameter, SortMemberAccess sortMemberAccess, bool isSorted )
       {
