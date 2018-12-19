@@ -26,13 +26,13 @@ namespace Vibrant.QuerySearch
       /// <param name="parameter">The parameter that was used to create the sort member accesses.</param>
       /// <param name="sortMemberAccesses">The sort member accesses that the query will be sorted by.</param>
       /// <returns>An ordered queryable.</returns>
-      public static IQueryable<TEntity> OrderBy<TEntity>( this IQueryable<TEntity> query, ParameterExpression parameter, SortMemberAccess sortMemberAccess )
+      public static IQueryable<TEntity> OrderBy<TEntity>( this IQueryable<TEntity> query, ParameterExpression parameter, SortMemberAccess sortMemberAccess, bool isSorted )
       {
          var delegateType = typeof( Func<,> ).MakeGenericType( typeof( TEntity ), sortMemberAccess.MemberType );
          var lambda = Expression.Lambda( delegateType, sortMemberAccess.MemberAccessor, parameter );
 
          MethodInfo orderingMethod;
-         if( query is IOrderedQueryable<TEntity> )
+         if( isSorted )
          {
             if( sortMemberAccess.SortDirection == SortDirection.Descending )
             {

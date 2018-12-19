@@ -107,16 +107,18 @@ namespace Vibrant.QuerySearch
          {
             // first order by user specified sorting
 
+            bool isSorted = false;
             foreach( var sort in sorting )
             {
                if( sort.MemberAccessor != null )
                {
-                  query = query.OrderBy( _parameter, sort );
+                  query = query.OrderBy( _parameter, sort, isSorted );
                }
                else
                {
-                  query = ApplyManualOrdering( query, sort.PropertyPath, sort.SortDirection );
+                  query = ApplyManualOrdering( query, sort.PropertyPath, sort.SortDirection, isSorted );
                }
+               isSorted = true;
 
                alreadySortedByPropertyPaths.Add( sort.PropertyPath );
             }
@@ -132,9 +134,9 @@ namespace Vibrant.QuerySearch
          return CreatePaginationResult( query, form, true );
       }
 
-      protected virtual IQueryable<TEntity> ApplyManualOrdering( IQueryable<TEntity> query, string propertyPath, SortDirection direction )
+      protected virtual IQueryable<TEntity> ApplyManualOrdering( IQueryable<TEntity> query, string propertyPath, SortDirection direction, bool isSorted )
       {
-         return query;
+         throw new QuerySearchException( $"Could not find the property at path '{propertyPath}' on the type '{typeof( TEntity ).FullName}'." );
       }
 
       protected PaginationResult<TEntity> CreatePaginationResult( IQueryable<TEntity> query, IPageForm form, bool applyPagination )
