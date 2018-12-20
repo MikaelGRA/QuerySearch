@@ -326,7 +326,13 @@ namespace Vibrant.QuerySearch
             currentBody = keywordPredicate;
          }
 
-         Expression<Func<TEntity, bool>> parameterPredicate = null;
+         
+         if( currentBody != null )
+         {
+            query = query.Where( currentBody );
+         }
+
+         
          var parameters = filteringForm.GetAdditionalFilters();
          if( parameters != null )
          {
@@ -334,79 +340,72 @@ namespace Vibrant.QuerySearch
             {
                var comparisonType = propertyComparison.GetComparisonType();
                var memberAccess = propertyComparison.GetMemberAccess( _parameter );
-               var memberAccessor = memberAccess.MemberAccessor;
-               var propertyType = memberAccess.MemberType;
-               var unwrappedPropertyType = propertyType.GetTypeInfo().IsGenericType && propertyType.GetGenericTypeDefinition() == typeof( Nullable<> )
-                  ? propertyType.GetTypeInfo().GetGenericArguments()[ 0 ]
-                  : propertyType;
                var propertyValue = propertyComparison.GetValue();
-
-
-               object convertedPropertyValue;
-               if( propertyValue is string && ( memberAccessor.Type == typeof( Guid ) || memberAccessor.Type == typeof( Guid? ) ) )
+               var memberAccessor = memberAccess.MemberAccessor;
+               if( memberAccessor != null )
                {
-                  convertedPropertyValue = Guid.Parse( (string)propertyValue );
+                  var propertyType = memberAccess.MemberType;
+                  var unwrappedPropertyType = propertyType.GetTypeInfo().IsGenericType && propertyType.GetGenericTypeDefinition() == typeof( Nullable<> )
+                     ? propertyType.GetTypeInfo().GetGenericArguments()[ 0 ]
+                     : propertyType;
+
+
+                  object convertedPropertyValue;
+                  if( propertyValue is string && ( memberAccessor.Type == typeof( Guid ) || memberAccessor.Type == typeof( Guid? ) ) )
+                  {
+                     convertedPropertyValue = Guid.Parse( (string)propertyValue );
+                  }
+                  else
+                  {
+                     convertedPropertyValue = Convert.ChangeType( propertyValue, memberAccessor.Type );
+                  }
+                  var parameterizedPropertyValue = ExpressionHelper.WrappedConstant( memberAccessor.Type, convertedPropertyValue );
+
+                  Expression left = null;
+                  switch( comparisonType )
+                  {
+                     case ComparisonType.Equal:
+                        left = Expression.Equal( memberAccessor, parameterizedPropertyValue );
+                        break;
+                     case ComparisonType.GreaterThan:
+                        left = Expression.GreaterThan( memberAccessor, parameterizedPropertyValue );
+                        break;
+                     case ComparisonType.GreaterThanOrEqual:
+                        left = Expression.GreaterThanOrEqual( memberAccessor, parameterizedPropertyValue );
+                        break;
+                     case ComparisonType.LessThan:
+                        left = Expression.LessThan( memberAccessor, parameterizedPropertyValue );
+                        break;
+                     case ComparisonType.LessThanOrEqual:
+                        left = Expression.LessThanOrEqual( memberAccessor, parameterizedPropertyValue );
+                        break;
+                     case ComparisonType.StartsWith:
+                        left = Expression.Call( memberAccessor, StartsWith, parameterizedPropertyValue );
+                        break;
+                     case ComparisonType.Contains:
+                        left = Expression.Call( memberAccessor, Contains, parameterizedPropertyValue );
+                        break;
+                     default:
+                        throw new InvalidOperationException( $"Invalid comparison type '{comparisonType}'." );
+                  }
+
+                  var expression = Expression.Lambda<Func<TEntity, bool>>( left, _parameter );
+
+                  query = query.Where( expression );
                }
                else
                {
-                  convertedPropertyValue = Convert.ChangeType( propertyValue, memberAccessor.Type );
+                  query = ApplyManualFiltering( query, memberAccess.PropertyPath, propertyValue );
                }
-               var parameterizedPropertyValue = ExpressionHelper.WrappedConstant( memberAccessor.Type, convertedPropertyValue );
-
-               Expression left = null;
-               switch( comparisonType )
-               {
-                  case ComparisonType.Equal:
-                     left = Expression.Equal( memberAccessor, parameterizedPropertyValue );
-                     break;
-                  case ComparisonType.GreaterThan:
-                     left = Expression.GreaterThan( memberAccessor, parameterizedPropertyValue );
-                     break;
-                  case ComparisonType.GreaterThanOrEqual:
-                     left = Expression.GreaterThanOrEqual( memberAccessor, parameterizedPropertyValue );
-                     break;
-                  case ComparisonType.LessThan:
-                     left = Expression.LessThan( memberAccessor, parameterizedPropertyValue );
-                     break;
-                  case ComparisonType.LessThanOrEqual:
-                     left = Expression.LessThanOrEqual( memberAccessor, parameterizedPropertyValue );
-                     break;
-                  case ComparisonType.StartsWith:
-                     left = Expression.Call( memberAccessor, StartsWith, parameterizedPropertyValue );
-                     break;
-                  case ComparisonType.Contains:
-                     left = Expression.Call( memberAccessor, Contains, parameterizedPropertyValue );
-                     break;
-                  default:
-                     throw new InvalidOperationException( $"Invalid comparison type '{comparisonType}'." );
-               }
-
-               parameterPredicate = AddExpression(
-                  parameterPredicate,
-                  Expression.Lambda<Func<TEntity, bool>>( left, _parameter ),
-                  ExpressionType.AndAlso );
             }
          }
 
-         // combine with current body as needed
-         if( currentBody != null && parameterPredicate != null )
-         {
-            currentBody = currentBody.And( parameterPredicate );
-         }
-         else if( parameterPredicate != null )
-         {
-            currentBody = parameterPredicate;
-         }
+         return query;
+      }
 
-
-         if( currentBody != null )
-         {
-            return query.Where( currentBody );
-         }
-         else
-         {
-            return query;
-         }
+      protected virtual IQueryable<TEntity> ApplyManualFiltering( IQueryable<TEntity> query, string propertyPath, object value )
+      {
+         throw new QuerySearchException( $"Could not find the property at path '{propertyPath}' on the type '{typeof( TEntity ).FullName}'." );
       }
 
       /// <summary>
