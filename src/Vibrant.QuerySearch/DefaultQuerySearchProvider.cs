@@ -460,22 +460,24 @@ namespace Vibrant.QuerySearch
       private Dictionary<string, Expression<Func<TEntity, bool>>> GetLocalizationDictionary()
       {
          var culture = CultureInfo.CurrentCulture;
-
-         Dictionary<string, Expression<Func<TEntity, bool>>> localizations;
-         if( !_localizationToPredicate.TryGetValue( culture, out localizations ) )
+         lock(_localizationToPredicate)
          {
-            localizations = new Dictionary<string, Expression<Func<TEntity, bool>>>( StringComparer.OrdinalIgnoreCase );
-            foreach( var kvp in _localizationKeyToPredicate )
-            {
-               var key = kvp.Key;
-               var expression = kvp.Value;
-               var localization = _localizationService.GetLocalization( typeof( TEntity ), key );
-               localizations.Add( localization, expression );
-            }
-            _localizationToPredicate.Add( culture, localizations );
-         }
+             Dictionary<string, Expression<Func<TEntity, bool>>> localizations;
+             if (!_localizationToPredicate.TryGetValue(culture, out localizations))
+             {
+                 localizations = new Dictionary<string, Expression<Func<TEntity, bool>>>(StringComparer.OrdinalIgnoreCase);
+                 foreach (var kvp in _localizationKeyToPredicate)
+                 {
+                     var key = kvp.Key;
+                     var expression = kvp.Value;
+                     var localization = _localizationService.GetLocalization(typeof(TEntity), key);
+                     localizations.Add(localization, expression);
+                 }
+                 _localizationToPredicate.Add(culture, localizations);
+             }
 
-         return localizations;
+             return localizations;
+         }
       }
 
       private Expression<Func<TEntity, bool>> AddExpression( Expression<Func<TEntity, bool>> currentBody, Expression<Func<TEntity, bool>> addition, ExpressionType type )
