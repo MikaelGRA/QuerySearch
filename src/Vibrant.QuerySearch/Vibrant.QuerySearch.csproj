@@ -4,9 +4,9 @@
       <Description>Provides IQueryable extensions for easily working with filtering and pagination.</Description>
       <Copyright>Copyright (c) 2015-2017 MikaelGRA</Copyright>
       <AssemblyTitle>QuerySearch for .NET</AssemblyTitle>
-      <Version>8.2.0</Version>
+      <Version>8.2.1</Version>
       <Authors>MikaelGRA</Authors>
-      <TargetFrameworks>net45;netstandard1.6</TargetFrameworks>
+      <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
       <AssemblyName>Vibrant.QuerySearch</AssemblyName>
       <PackageId>Vibrant.QuerySearch</PackageId>
       <PackageTags>queryable;entity-framework</PackageTags>
@@ -20,7 +20,7 @@
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
    </PropertyGroup>
 
-   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
       <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
    </ItemGroup>
 

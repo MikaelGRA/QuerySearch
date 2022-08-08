@@ -10,10 +10,10 @@ using Vibrant.QuerySearch.Form;
 
 namespace Vibrant.QuerySearch.ConsoleApp
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
+   public class Program
+   {
+      public static void Main( string[] args )
+      {
          var services = new ServiceCollection();
 
          services.AddSingleton<ILocalizationService, DefaultLocalizationService>();
@@ -61,7 +61,7 @@ namespace Vibrant.QuerySearch.ConsoleApp
          var items = new List<Item>
             {
                new Item { Lol = "Hehehe", Id = id },
-               new Item { Lol = "ABC", Id = Guid.NewGuid() },
+               new Item { Lol = "ABC", Id = Guid.NewGuid(), Hehe = Whatever.Haha },
             };
 
          var form = new SearchForm
@@ -72,9 +72,9 @@ namespace Vibrant.QuerySearch.ConsoleApp
             {
                new PropertyComparison
                {
-                  Path = "lol",
+                  Path = "Hehe",
                   Type = ComparisonType.IsAnyOf,
-                  Value = new List<object> { "LOl", "Hehehe", "ABC" }
+                  Value = new List<object> { "Haha" }
                }
             }
          };
@@ -83,37 +83,45 @@ namespace Vibrant.QuerySearch.ConsoleApp
 
          Console.ReadKey();
       }
-    }
+   }
 
-    public class DependencyResolverImpl : IDependencyResolver
-    {
-        private IServiceProvider _serviceProvider;
+   public class DependencyResolverImpl : IDependencyResolver
+   {
+      private IServiceProvider _serviceProvider;
 
-        public DependencyResolverImpl(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider;
-        }
+      public DependencyResolverImpl( IServiceProvider serviceProvider )
+      {
+         _serviceProvider = serviceProvider;
+      }
 
-        public TService Resolve<TService>()
-        {
-            return _serviceProvider.GetRequiredService<TService>();
-        }
-    }
+      public TService Resolve<TService>()
+      {
+         return _serviceProvider.GetRequiredService<TService>();
+      }
+   }
 
-    public class ItemQuerySearchProvider : DefaultQuerySearchProvider<Item>
-    {
-        public ItemQuerySearchProvider(ILocalizationService localization) : base(localization)
-        {
-            RegisterDefaultSort(q => q.OrderBy(x => x.Lol));
-            RegisterUniqueSort(q => q.ThenBy(x => x.Lol));
-            Mode = PaginationMode.MinMaxPageSize;
-        }
-    }
+   public class ItemQuerySearchProvider : DefaultQuerySearchProvider<Item>
+   {
+      public ItemQuerySearchProvider( ILocalizationService localization ) : base( localization )
+      {
+         RegisterDefaultSort( q => q.OrderBy( x => x.Lol ) );
+         RegisterUniqueSort( q => q.ThenBy( x => x.Lol ) );
+         Mode = PaginationMode.MinMaxPageSize;
+      }
+   }
 
-    public class Item
-    {
-        public string Lol { get; set; }
+   public class Item
+   {
+      public string Lol { get; set; }
 
-        public Guid Id { get; set; }
-    }
+      public Guid Id { get; set; }
+
+      public Whatever Hehe { get; set; }
+   }
+
+   public enum Whatever
+   {
+      Hoho,
+      Haha
+   }
 }

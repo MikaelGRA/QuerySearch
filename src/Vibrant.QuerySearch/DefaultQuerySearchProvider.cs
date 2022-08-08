@@ -423,6 +423,10 @@ namespace Vibrant.QuerySearch
          {
             convertedPropertyValue = Guid.Parse( (string)originalValue );
          }
+         else if( unwrappedPropertyType.IsEnum && originalValue is string originalStringValue )
+         {
+            convertedPropertyValue = Enum.Parse( unwrappedPropertyType, originalStringValue, true );
+         }
          else if( originalValue is IConvertible )
          {
             convertedPropertyValue = Convert.ChangeType( originalValue, unwrappedPropertyType );
