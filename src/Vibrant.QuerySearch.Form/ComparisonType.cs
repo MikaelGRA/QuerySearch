@@ -44,5 +44,10 @@ namespace Vibrant.QuerySearch.Form
       /// A contains comparison.
       /// </summary>
       Contains = 7,
+
+      /// <summary>
+      /// A contains for a collection parameter.
+      /// </summary>
+      IsAnyOf = 8,
    }
 }

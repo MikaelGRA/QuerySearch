@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -290,9 +291,9 @@ namespace Vibrant.QuerySearch
 
          var localizations = GetLocalizationDictionary();
          Expression<Func<TEntity, bool>> keywordPredicate = null;
-         for( int i = 0 ; i < words.Length ; i++ )
+         for( int i = 0; i < words.Length; i++ )
          {
-            for( int j = i ; j < words.Length ; j++ )
+            for( int j = i; j < words.Length; j++ )
             {
                // from i to j
                var word = string.Join( " ", words, i, j - i + 1 );
@@ -326,13 +327,13 @@ namespace Vibrant.QuerySearch
             currentBody = keywordPredicate;
          }
 
-         
+
          if( currentBody != null )
          {
             query = query.Where( currentBody );
          }
 
-         
+
          var parameters = filteringForm.GetAdditionalFilters();
          if( parameters != null )
          {
@@ -345,45 +346,53 @@ namespace Vibrant.QuerySearch
                if( memberAccessor != null )
                {
                   var propertyType = memberAccess.MemberType;
-                  var unwrappedPropertyType = propertyType.GetTypeInfo().IsGenericType && propertyType.GetGenericTypeDefinition() == typeof( Nullable<> )
-                     ? propertyType.GetTypeInfo().GetGenericArguments()[ 0 ]
-                     : propertyType;
-
-
-                  object convertedPropertyValue;
-                  if( propertyValue is string && ( memberAccessor.Type == typeof( Guid ) || memberAccessor.Type == typeof( Guid? ) ) )
-                  {
-                     convertedPropertyValue = Guid.Parse( (string)propertyValue );
-                  }
-                  else
-                  {
-                     convertedPropertyValue = Convert.ChangeType( propertyValue, memberAccessor.Type );
-                  }
-                  var parameterizedPropertyValue = ExpressionHelper.WrappedConstant( memberAccessor.Type, convertedPropertyValue );
+                  var convertedPropertyValue = ConvertValue( propertyValue, propertyType );
 
                   Expression left = null;
                   switch( comparisonType )
                   {
                      case ComparisonType.Equal:
-                        left = Expression.Equal( memberAccessor, parameterizedPropertyValue );
+                        left = Expression.Equal( memberAccessor, ExpressionHelper.WrappedConstant( memberAccessor.Type, convertedPropertyValue ) );
                         break;
                      case ComparisonType.GreaterThan:
-                        left = Expression.GreaterThan( memberAccessor, parameterizedPropertyValue );
+                        left = Expression.GreaterThan( memberAccessor, ExpressionHelper.WrappedConstant( memberAccessor.Type, convertedPropertyValue ) );
                         break;
                      case ComparisonType.GreaterThanOrEqual:
-                        left = Expression.GreaterThanOrEqual( memberAccessor, parameterizedPropertyValue );
+                        left = Expression.GreaterThanOrEqual( memberAccessor, ExpressionHelper.WrappedConstant( memberAccessor.Type, convertedPropertyValue ) );
                         break;
                      case ComparisonType.LessThan:
-                        left = Expression.LessThan( memberAccessor, parameterizedPropertyValue );
+                        left = Expression.LessThan( memberAccessor, ExpressionHelper.WrappedConstant( memberAccessor.Type, convertedPropertyValue ) );
                         break;
                      case ComparisonType.LessThanOrEqual:
-                        left = Expression.LessThanOrEqual( memberAccessor, parameterizedPropertyValue );
+                        left = Expression.LessThanOrEqual( memberAccessor, ExpressionHelper.WrappedConstant( memberAccessor.Type, convertedPropertyValue ) );
                         break;
                      case ComparisonType.StartsWith:
-                        left = Expression.Call( memberAccessor, StartsWith, parameterizedPropertyValue );
+                        left = Expression.Call( memberAccessor, StartsWith, ExpressionHelper.WrappedConstant( memberAccessor.Type, convertedPropertyValue ) );
                         break;
                      case ComparisonType.Contains:
-                        left = Expression.Call( memberAccessor, Contains, parameterizedPropertyValue );
+                        left = Expression.Call( memberAccessor, Contains, ExpressionHelper.WrappedConstant( memberAccessor.Type, convertedPropertyValue ) );
+                        break;
+                     case ComparisonType.IsAnyOf:
+                        if( convertedPropertyValue is IEnumerable enumerable )
+                        {
+                           foreach( var collectionItem in enumerable )
+                           {
+                              var convertedCollectionItem = ConvertValue( collectionItem, propertyType );
+                              var parameterizedCollectionItem = ExpressionHelper.WrappedConstant( memberAccessor.Type, convertedCollectionItem );
+                              if( left == null )
+                              {
+                                 left = Expression.Equal( memberAccessor, parameterizedCollectionItem );
+                              }
+                              else
+                              {
+                                 left = Expression.Or( left, Expression.Equal( memberAccessor, parameterizedCollectionItem ) );
+                              }
+                           }
+                        }
+                        else
+                        {
+                           throw new QuerySearchException( "Expected collection for property: " + memberAccess.PropertyPath );
+                        }
                         break;
                      default:
                         throw new InvalidOperationException( $"Invalid comparison type '{comparisonType}'." );
@@ -401,6 +410,29 @@ namespace Vibrant.QuerySearch
          }
 
          return query;
+      }
+
+      private static object ConvertValue( object originalValue, Type propertyType )
+      {
+         var unwrappedPropertyType = propertyType.GetTypeInfo().IsGenericType && propertyType.GetGenericTypeDefinition() == typeof( Nullable<> )
+            ? propertyType.GetTypeInfo().GetGenericArguments()[ 0 ]
+            : propertyType;
+
+         object convertedPropertyValue;
+         if( originalValue is string && ( unwrappedPropertyType == typeof( Guid ) || unwrappedPropertyType == typeof( Guid? ) ) )
+         {
+            convertedPropertyValue = Guid.Parse( (string)originalValue );
+         }
+         else if( originalValue is IConvertible )
+         {
+            convertedPropertyValue = Convert.ChangeType( originalValue, unwrappedPropertyType );
+         }
+         else
+         {
+            convertedPropertyValue = originalValue;
+         }
+
+         return convertedPropertyValue;
       }
 
       protected virtual IQueryable<TEntity> ApplyManualFiltering( IQueryable<TEntity> query, string propertyPath, object value )
@@ -460,23 +492,23 @@ namespace Vibrant.QuerySearch
       private Dictionary<string, Expression<Func<TEntity, bool>>> GetLocalizationDictionary()
       {
          var culture = CultureInfo.CurrentCulture;
-         lock(_localizationToPredicate)
+         lock( _localizationToPredicate )
          {
-             Dictionary<string, Expression<Func<TEntity, bool>>> localizations;
-             if (!_localizationToPredicate.TryGetValue(culture, out localizations))
-             {
-                 localizations = new Dictionary<string, Expression<Func<TEntity, bool>>>(StringComparer.OrdinalIgnoreCase);
-                 foreach (var kvp in _localizationKeyToPredicate)
-                 {
-                     var key = kvp.Key;
-                     var expression = kvp.Value;
-                     var localization = _localizationService.GetLocalization(typeof(TEntity), key);
-                     localizations.Add(localization, expression);
-                 }
-                 _localizationToPredicate.Add(culture, localizations);
-             }
+            Dictionary<string, Expression<Func<TEntity, bool>>> localizations;
+            if( !_localizationToPredicate.TryGetValue( culture, out localizations ) )
+            {
+               localizations = new Dictionary<string, Expression<Func<TEntity, bool>>>( StringComparer.OrdinalIgnoreCase );
+               foreach( var kvp in _localizationKeyToPredicate )
+               {
+                  var key = kvp.Key;
+                  var expression = kvp.Value;
+                  var localization = _localizationService.GetLocalization( typeof( TEntity ), key );
+                  localizations.Add( localization, expression );
+               }
+               _localizationToPredicate.Add( culture, localizations );
+            }
 
-             return localizations;
+            return localizations;
          }
       }
 
